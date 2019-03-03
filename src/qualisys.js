@@ -8,9 +8,6 @@ function init(io) {
     console.log(socket);
   });
 
-
-  let x = 0
-
   qtmReader.on('frame', function(data) {
     // console.log('Received frame:'.green);
     // console.log(data.components);
@@ -36,20 +33,20 @@ function init(io) {
       client.send(message, 0, message.length, port, ip, (err, bytes) => {
         if (err) throw err
         client.close()
-      })  
+      })
     }
-    
+
 
   });
-  
+
   qtmReader.on('end', function(data) {
     console.log('No more data!'.red);
   });
-  
+
   qtmReader.on('event', function(event) {
     console.log(event.name.yellow);
   });
-  
+
   qtmReader.on('disconnect', function(event) {
     process.exit();
   });

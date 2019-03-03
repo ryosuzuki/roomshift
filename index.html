@@ -2,28 +2,18 @@
 
 <html>
   <head>
-    <title>Mocap Areana QTM RT Server Info</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta charset="UTF-8">
-
+    <title>RoomShift</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.2.7/semantic.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
 
-    <script>
-      const socket = io()
-
-      socket.on('frame', (msg) => {
-        // console.log(msg)
-        let objects = msg 
-        let text = JSON.stringify(msg, null, 2)
-        $('#result').text(text)
-      })
-    </script>
   </head>
 
   <body>
-    <h1>Some info here</h1>
-
-    <pre id='result'></pre>
+    <div id="react-app"></div>
+    <script src="/build/bundle.js"></script>
   </body>
 </html>

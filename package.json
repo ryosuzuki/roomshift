@@ -1,12 +1,10 @@
 {
-  "name": "mocap-server",
+  "name": "RoomShift",
   "version": "0.1.0",
   "description": "",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
-    "start": "node index.js",
-    "start:dev": "nodemon index.js",
-    "lint": "eslint .",
+    "start": "webpack --color --progress --watch --mode development",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -14,13 +12,26 @@
   "dependencies": {
     "dgram": "^1.0.1",
     "express": "^4.16.4",
-    "qualisys-rt": "^0.2.4",
+    "keypress": "^0.2.1",
+    "lodash": "^4.17.11",
+    "munkres-js": "^1.2.2",
+    "qualisys-rt": "^0.3.1",
+    "react": "^16.8.3",
+    "react-dom": "^16.8.3",
+    "semantic-ui-css": "^2.4.1",
     "socket.io": "^2.2.0"
   },
   "devDependencies": {
-    "babel-eslint": "^10.0.1",
-    "eslint": "^5.9.0",
-    "eslint-config-airbnb-base": "^13.1.0",
-    "eslint-plugin-import": "^2.14.0"
+    "@babel/cli": "^7.2.3",
+    "@babel/core": "^7.3.4",
+    "@babel/polyfill": "^7.2.5",
+    "@babel/preset-env": "^7.3.4",
+    "@babel/preset-react": "^7.0.0",
+    "babel-loader": "^8.0.5",
+    "css-loader": "^2.1.0",
+    "html-loader": "^0.5.5",
+    "style-loader": "^0.23.1",
+    "webpack": "^4.29.6",
+    "webpack-cli": "^3.2.3"
   }
 }
