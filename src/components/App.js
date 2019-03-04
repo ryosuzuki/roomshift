@@ -14,7 +14,7 @@ class App extends Component {
     this.socket = socket
     this.state = {
       robots: [],
-      objects: [],
+      data: null,
       ids: [],
       corners: [],
       points: []
@@ -25,31 +25,42 @@ class App extends Component {
       0: '192.168.1.231',
     }
     this.port = 8883
-    this.width = 1920
-    this.height = 1080
+    this.width = 1000
+    this.height = 700
 
     this.log()
+    this.forceStop = false
   }
 
   componentDidMount() {
   }
 
-  updateRobots(msg) {
-    let objects = msg
-    // objects.map((pos) => {
-    // })
-    let robots = objects
-    this.setState({ objects: objects, robots: robots })
+  updateRobots(data) {
+    let objects = data.components['6dEuler'].rigidBodies
+    let robots = []
+    let id = 0
+    for (let object of objects) {
+      if (!object.x || !object.y || !object.z) continue 
+      let robot = {
+        id: id,
+        pos: { x: object.x / 7, y: - object.y / 7, z: object.z / 7 },
+        angle: (-object.euler3 + 180 + 90) % 360
+      }
+      id++
+      robots.push(robot)
+    }
+    this.setState({ data: data, robots: robots })
   }
 
   onClick(event) {
     if (!this.count) this.count = 0
-    let x = event.clientX
-    let y = event.clientY
+    let x = event.clientX - this.width/2
+    let y = event.clientY - this.height/2
 
+    console.log(x, y)
     let max = this.state.robots.length
     let i = this.count % max
-    let point = { x: x * 2, y: y * 2 }
+    let point = { x: x, y: y }
     let points = this.state.points
     points[i] = point
     this.setState({ points: points })
@@ -93,47 +104,44 @@ class App extends Component {
   async move(id, point) {
     let error = 0
     let prev
-    let Ib = 200
-    let Ip = 200
+    let Ib = 100
+    let Ip = 100
     while (true) {
       try {
         let res = this.calculate(id, point)
-        if (res.dist < 150) break
+        console.log(res.dist)
+        if (res.dist < 10) break
+        if (this.forceStop) break
 
-        // forward: a2, b1, right: a2, left: b1
         let base = Math.min(Ib, res.dist+100)
-        let a2 = base
-        let b1 = base
-        let a1 = 0
-        let b2 = 0
+        let left = base
+        let right = base
         let param = 5
 
         let unit = (90 - Math.abs(res.diff)) / 90
-        let Kd = 0.5
+        let Kd = 3
         let D = !prev ? 0 : unit - prev
         prev = unit
         Ib += 20
         Ip += 10
         let Kp = Math.min(Ip, base)
-        console.log(Kp)
+        // console.log(Kp)
         /*
         Ryo's note: If Kp is too high, it will be overshooting. Thus, start from a small value at the beginning to avoid overshooting, while gradually increasing the value once it starts adjusting the path and angle.
         */
         if (res.diff < 0) { // left
-          a2 = Math.max(unit - Kd*D, 0) * Kp
-          a1 = Math.max(-unit - Kd*D, 0) * Kp
+          right = Math.max(unit - Kd*D, 0) * Kp
         } else { // right
-          b1 = Math.max(unit - Kd*D, 0) * Kp
-          b2 = Math.max(-unit - Kd*D, 0) * Kp
+          left = Math.max(unit - Kd*D, 0) * Kp
         }
 
-        a1 = parseInt(a1)
-        a2 = parseInt(a2)
-        b1 = parseInt(b1)
-        b2 = parseInt(b2)
-        let command = { a1: a1, a2: a2, b1: b1, b2: b2 }
+        left = parseInt(left)
+        right = parseInt(right)
+        left = Math.min(left, 255)
+        right = Math.min(right, 255)
+        let command = { left: left, right: right }
         let message = { command: command, ip: this.ips[id], port: this.port }
-        this.socket.send(JSON.stringify(message))
+        this.socket.emit('move', JSON.stringify(message))
         await this.sleep(100)
       } catch (err) {
         console.log('lost AR marker')
@@ -144,12 +152,15 @@ class App extends Component {
     }
     console.log('finish')
     this.stop(id)
+    this.forceStop = false
   }
 
   stop(id) {
-    let command = { a1: 0, a2: 0, b1: 0, b2: 0 }
+    id = 0
+    this.forceStop = true
+    let command = { left: 0, right: 0 }
     let message = { command: command, ip: this.ips[id], port: this.port }
-    this.socket.send(JSON.stringify(message))
+    this.socket.emit('move', JSON.stringify(message))
   }
 
   async sleep(time) {
@@ -190,7 +201,7 @@ class App extends Component {
       <div>
         <div className="ui grid">
           <div className="twelve wide column">
-            <svg id="svg" width={ this.width / 2 } height={ this.height / 2 } onClick={ this.onClick.bind(this) }>
+            <svg id="svg" width={ this.width } height={ this.height } viewBox={`-${this.width/2} -${this.height/2} ${this.width} ${this.height}`} onClick={ this.onClick.bind(this) }>
               { this.state.robots.map((robot, i) => {
                 return (
                   <Robot
@@ -220,10 +231,15 @@ class App extends Component {
               Move
             </div>
             <br/>
+            <div className="ui orange button" onClick={ this.stop.bind(this) }>
+              Stop
+            </div>
             <br/>
             <div>
               Robots
-              <pre id="robots">{ JSON.stringify(this.state.objects, null, 2) }</pre>
+              <pre id="robots">{ JSON.stringify(this.state.robots, null, 2) }</pre>
+              Data
+              <pre id="data">{ JSON.stringify(this.state.data, null, 2) }</pre>
             </div>
           </div>
         </div>

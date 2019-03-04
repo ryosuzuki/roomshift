@@ -10,7 +10,7 @@ const app = express()
 const server = http.Server(app)
 const io = socketio(server)
 
-// qtmParser(io)
+qtmParser(io)
 
 app.use(bodyParser.json())
 app.use('/', express.static(__dirname))
@@ -28,12 +28,14 @@ io.on('connection', (socket) => {
   socket.on('move', (data) => {
     console.log(data)
     const client = dgram.createSocket('udp4')
-    // json = { ip: ip, left: 100, right: 100 }
+    // json = { command: { left: 100, right: 100 } ip: ip, port: 8883 }
     let json = JSON.parse(data)
     let ip = json.ip
-    let str = JSON.stringify(json)
+    let port = json.port
+    let command = json.command
+    let str = JSON.stringify(command)
     let message = Buffer.from(str)
-    let port = 8883
+    console.log(str)
     client.send(message, 0, message.length, port, ip, function(err, bytes) {
       if (err) throw err
       client.close()

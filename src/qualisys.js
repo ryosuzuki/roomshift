@@ -1,50 +1,22 @@
 const colors = require('colors')
 const QTMrt = require('qualisys-rt');
 const qtmReader = new QTMrt.Api();
-const dgram = require('dgram')
 
 function init(io) {
   io.on('connection', (socket) => {
-    console.log(socket);
+    // console.log(socket);
   });
 
   qtmReader.on('frame', function(data) {
-    // console.log('Received frame:'.green);
-    // console.log(data.components);
-
-    let objects = data.components['6dEuler'].rigidBodies.map(
-      body => {
-        return {
-          x: body.x,
-          y: body.y,
-          z: body.z,
-        }
-      })
-
-    io.sockets.emit('frame', objects)
-
-    const client = dgram.createSocket('udp4')
-
-    let object = objects[0]
-    if (object) {
-      let message = JSON.stringify({ x: object.x, y: object.y, z: object.z })
-      let port = 8883
-      let ip = '192.168.1.111'
-      client.send(message, 0, message.length, port, ip, (err, bytes) => {
-        if (err) throw err
-        client.close()
-      })
-    }
-
-
+    io.sockets.emit('frame', data)
   });
 
   qtmReader.on('end', function(data) {
-    console.log('No more data!'.red);
+    // console.log('No more data!'.red);
   });
 
   qtmReader.on('event', function(event) {
-    console.log(event.name.yellow);
+    // console.log(event.name.yellow);
   });
 
   qtmReader.on('disconnect', function(event) {
