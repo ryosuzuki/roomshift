@@ -15,6 +15,8 @@ SoftwareSerial Roomba(rx, tx);
 void setup() {
   Roomba.begin(115200);
   pinMode(dd, OUTPUT);
+  pinMode(a1, OUTPUT);
+  pinMode(a2, OUTPUT);
 
   Serial.begin (9600);
   delay(10);
@@ -96,10 +98,24 @@ void loop() {
 
     int left = root["left"];
     int right = root["right"];
-    Serial.println(left);
-    Serial.println(right);
+    Serial.print("left: ");
+    Serial.print(left);
+    Serial.print(", right: ");
+    Serial.print(right);
+    Serial.println();
     Serial.println();
     opDrivePWM(left, right);
+
+    if (root["a1"] > 0) {
+      digitalWrite(a1, HIGH);
+    } else {
+      digitalWrite(a1, LOW);      
+    }
+    if (root["a2"] > 0) {
+      digitalWrite(a2, HIGH);
+    } else {
+      digitalWrite(a2, LOW);      
+    }
 
     /*
     UDP.beginPacket("0.0.0.0", 8884);

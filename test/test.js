@@ -2,6 +2,7 @@ let HOST = '128.138.221.196'
 HOST = '192.168.1.231'
 HOST = '128.138.221.145'
 HOST = '128.138.221.159'
+HOST = '128.138.221.121'
 
 const PORT = 8883
 
@@ -23,6 +24,7 @@ keypress(process.stdin)
 
 process.stdin.on('keypress', function (ch, key) {
   console.log(key.name)
+
   switch (key.name) {
     case 'up':
       let forward = { left: 255, right: 255 }
@@ -39,6 +41,14 @@ process.stdin.on('keypress', function (ch, key) {
     case 'right':
       let right = { left: 0, right: 255 }
       sendCommand(right)
+      break
+    case 'a':
+      let extend = { a1: 1, a2: 0 }
+      sendCommand(extend)
+      break
+    case 's':
+      let collapse = { a1: 0, a2: 1 }
+      sendCommand(collapse)
       break
     default:
       console.log('press arrow key')
