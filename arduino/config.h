@@ -12,8 +12,13 @@ int rx = 5; // D1 -> Roomba TX 4 (Left Middle)
 int tx = 4; // D2 -> Roomba RX 3 (Right Middle)
 int dd = 0; // D3 -> Roomba BRC 5 (Right Top)
 
-int a1 = 14; // D5
-int a2 = 12; // D6
+int a1 = 14; // D5 -> A1 + B1
+int a2 = 12; // D6 -> A2 + B2
+
+//int a1 = 13; // D7 -> A1
+//int a2 = 15; // D8 -> A2
+//int b1 = 14; // D5 -> B1
+//int b2 = 12; // D6 -> B2
 
 #define OP_START     128
 #define OP_SAFE_MODE 131
