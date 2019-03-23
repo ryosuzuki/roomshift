@@ -98,12 +98,6 @@ void loop() {
 
     int left = root["left"];
     int right = root["right"];
-    Serial.print("left: ");
-    Serial.print(left);
-    Serial.print(", right: ");
-    Serial.print(right);
-    Serial.println();
-    Serial.println();
     opDrivePWM(left, right);
 
     if (root["a1"] > 0) {
