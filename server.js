@@ -4,13 +4,9 @@ const path = require('path')
 const socketio = require('socket.io')
 const dgram = require('dgram')
 const bodyParser = require('body-parser')
-const qtmParser = require('./src/qualisys.js')
-
 const app = express()
 const server = http.Server(app)
 const io = socketio(server)
-
-qtmParser(io)
 
 app.use(bodyParser.json())
 app.use('/', express.static(__dirname))

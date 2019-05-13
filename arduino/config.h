@@ -1,10 +1,10 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-//static const char *ssid = "Ryo Suzuki";
-//static const char *password = "ryotomomi";
-static const char *ssid = "The Grid";
-static const char *password = "BeamMeIn";
+static const char *ssid = "Ryo Suzuki";
+static const char *password = "ryotomomi";
+//static const char *ssid = "The Grid";
+//static const char *password = "BeamMeIn";
 
 int localPort = 8883;
 
@@ -22,8 +22,10 @@ int a2 = 12; // D6 -> A2 + B2
 
 #define OP_START     128
 #define OP_SAFE_MODE 131
-#define OP_POWER     133
+#define OP_POWER_OFF 133
 #define OP_DRIVE_PWM 146
 #define OP_DIGIT_LED 164
+#define OP_LED       139
+#define OP_SEEK_DOCK 143
 
 #endif

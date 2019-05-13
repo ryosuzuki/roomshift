@@ -1,21 +1,5 @@
-let HOST = '128.138.221.196'
-HOST = '192.168.1.231'
-HOST = '128.138.221.145'
-HOST = '128.138.221.159'
+let HOST = '128.138.221.192'
 HOST = '128.138.221.121'
-HOST = '128.138.221.115'
-HOST = '128.138.221.131'
-
-HOST = '128.138.221.119' // 1
-HOST = '128.138.221.159' // 2
-HOST = '128.138.221.176' // 3
-HOST = '128.138.221.192' // 4
-HOST = '128.138.221.105' // 5
-HOST = '128.138.221.142' // 6
-HOST = '128.138.221.121' // 7
-
-HOST = '192.168.1.158'
-
 
 const PORT = 8883
 
@@ -40,7 +24,7 @@ process.stdin.on('keypress', function (ch, key) {
 
   switch (key.name) {
     case 'up':
-      let forward = { left: 255, right: 255 }
+      let forward = { left: 100, right: 100 }
       sendCommand(forward)
       break
     case 'down':
@@ -48,12 +32,16 @@ process.stdin.on('keypress', function (ch, key) {
       sendCommand(stop)
       break
     case 'left':
-      let left = { left: 255, right: 0 }
+      let left = { left: -100, right: 100 }
       sendCommand(left)
       break
     case 'right':
-      let right = { left: 0, right: 255 }
+      let right = { left: 100, right: -100 }
       sendCommand(right)
+      break
+    case 'd':
+      let backward = { left: -100, right: -100 }
+      sendCommand(backward)
       break
     case 'a':
       let extend = { a1: 1, a2: 0 }
@@ -62,6 +50,18 @@ process.stdin.on('keypress', function (ch, key) {
     case 's':
       let collapse = { a1: 0, a2: 1 }
       sendCommand(collapse)
+      break
+    case 'r':
+      let reset = { reset: 1 }
+      sendCommand(reset)
+      break
+    case 'x':
+      let sleep = { sleep: 1 }
+      sendCommand(sleep)
+      break
+    case 'l':
+      let dock = { dock: 1 }
+      sendCommand(dock)
       break
     default:
       console.log('press arrow key')

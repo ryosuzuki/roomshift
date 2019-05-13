@@ -70,20 +70,43 @@ void wakeUp () {
 void startSafe() {
   Serial.println("Start Safe");
   Roomba.write(OP_START);
+  delay(50);
   Roomba.write(OP_SAFE_MODE);
-  delay(1000);
+  delay(50);
 }
 
-void opDrivePWM(signed short rightPWM, signed short leftPWM) {
+void sleep() {
+  Serial.println("Sleep");  
+  Roomba.write(OP_POWER_OFF);
+}
+
+void seekDock() {
+  Serial.println("Seek Dock");  
+  Roomba.write(OP_SEEK_DOCK);
+}
+
+void drive(int velocity, int radius) {  
+  Roomba.write(137);
+  Roomba.write(velocity >> 8);
+  Roomba.write(velocity);
+  Roomba.write(radius >> 8);
+  Roomba.write(radius);
+}
+
+void driveWheels(int left, int right) {
+  Roomba.write(145);
+  Roomba.write(right >> 8);
+  Roomba.write(right);
+  Roomba.write(left >> 8);
+  Roomba.write(left);
+}
+
+void drivePWM(signed short leftPWM, signed short rightPWM) {
   Roomba.write(OP_DRIVE_PWM);
   Roomba.write(rightPWM >> 8);
   Roomba.write(rightPWM);
   Roomba.write(leftPWM >> 8);
   Roomba.write(leftPWM);
-}
-
-void powerOff() {
-  Roomba.write(OP_POWER);
 }
 
 void loop() {
@@ -98,7 +121,10 @@ void loop() {
 
     int left = root["left"];
     int right = root["right"];
-    opDrivePWM(left, right);
+
+//    drive(left, 0);
+//    driveWheels(left, right);
+    drivePWM(left, right);
 
     if (root["a1"] > 0) {
       digitalWrite(a1, HIGH);
@@ -109,6 +135,16 @@ void loop() {
       digitalWrite(a2, HIGH);
     } else {
       digitalWrite(a2, LOW);      
+    }
+    if (root["reset"] > 0) {
+      wakeUp();
+      startSafe();
+    }
+    if (root["sleep"] > 0) {
+      sleep();
+    }
+    if (root["dock"] > 0) {
+      seekDock();
     }
 
     /*
