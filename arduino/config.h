@@ -27,5 +27,7 @@ int a2 = 12; // D6 -> A2 + B2
 #define OP_DIGIT_LED 164
 #define OP_LED       139
 #define OP_SEEK_DOCK 143
+#define OP_DRIVE     137
+#define OP_DRIVE_WH  145
 
 #endif
