@@ -22,9 +22,10 @@ keypress(process.stdin)
 
 process.stdin.on('keypress', function (ch, key) {
   console.log(key.name)
+
   switch (key.name) {
     case 'up':
-      let forward = { left: 255, right: 255 }
+      let forward = { left: 100, right: 100 }
       sendCommand(forward)
       break
     case 'down':
@@ -32,12 +33,36 @@ process.stdin.on('keypress', function (ch, key) {
       sendCommand(stop)
       break
     case 'left':
-      let left = { left: 255, right: 0 }
+      let left = { left: -100, right: 100 }
       sendCommand(left)
       break
     case 'right':
-      let right = { left: 0, right: 255 }
+      let right = { left: 100, right: -100 }
       sendCommand(right)
+      break
+    case 'd':
+      let backward = { left: -100, right: -100 }
+      sendCommand(backward)
+      break
+    case 'a':
+      let extend = { a1: 1, a2: 0 }
+      sendCommand(extend)
+      break
+    case 's':
+      let collapse = { a1: 0, a2: 1 }
+      sendCommand(collapse)
+      break
+    case 'r':
+      let reset = { reset: 1 }
+      sendCommand(reset)
+      break
+    case 'x':
+      let sleep = { sleep: 1 }
+      sendCommand(sleep)
+      break
+    case 'l':
+      let dock = { dock: 1 }
+      sendCommand(dock)
       break
     default:
       console.log('press arrow key')
