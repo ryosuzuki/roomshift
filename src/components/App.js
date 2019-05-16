@@ -2,11 +2,11 @@ import React, { Component } from 'react'
 import munkres from 'munkres-js'
 import _ from 'lodash'
 
-const socket = new WebSocket('ws://localhost:8080/ws')
+// const socket = new WebSocket('ws://localhost:8080/ws')
+const socket = io.connect('http://localhost:8080/')
 
 import Robot from './Robot'
 import Point from './Point'
-import Camera from './Camera'
 
 class App extends Component {
   constructor(props) {
@@ -22,9 +22,10 @@ class App extends Component {
       points: []
     }
     // this.socket.onmessage = this.onMessage.bind(this)
-    this.socket.onmessage = Camera.onMessage.bind(Camera)
+    // this.socket.onmessage = Camera.onMessage.bind(Camera)
+    this.socket.on('frame', this.updateRobots.bind(this))
     this.ips = {
-      0: '192.168.1.231',
+      0: '192.168.1.140',
       1: '192.168.1.119'
     }
     this.port = 8883
@@ -207,9 +208,7 @@ class App extends Component {
 
   render() {
     return (
-      <div>
-        <canvas id="camera" width={ this.width } height={ this.height }></canvas>
-        {/*
+      <div>        
         <div className="ui grid">
           <div className="twelve wide column">
             <svg id="svg" width={ this.width } height={ this.height } viewBox={`-${this.width/2} -${this.height/2} ${this.width} ${this.height}`} onClick={ this.onClick.bind(this) }>
@@ -254,7 +253,6 @@ class App extends Component {
             </div>
           </div>
         </div>
-        */}
       </div>
     )
   }

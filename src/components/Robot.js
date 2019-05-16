@@ -34,7 +34,7 @@ class Robot extends Component {
             strokeWidth="3"
           />
           <rect
-            transform={ `rotate(${this.angle}) translate(-5, -35)`}
+            transform={ `rotate(${this.angle + 270}) translate(-5, -35)`}
             width="10"
             height="10"
             fill="#f00"
