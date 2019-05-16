@@ -23,6 +23,7 @@ class App extends Component {
     this.socket.on('frame', this.updateRobots.bind(this))
     this.ips = {
       0: '192.168.1.231',
+      1: '192.168.1.119'
     }
     this.port = 8883
     this.width = 1000
@@ -36,6 +37,7 @@ class App extends Component {
   }
 
   updateRobots(data) {
+    // console.log(data)
     let objects = data.components['6dEuler'].rigidBodies
     let robots = []
     let id = 0
@@ -44,7 +46,7 @@ class App extends Component {
       let robot = {
         id: id,
         pos: { x: object.x / 7, y: - object.y / 7, z: object.z / 7 },
-        angle: (-object.euler3 + 180 + 90) % 360
+        angle: (-object.euler3 + 180 + 180) % 360
       }
       id++
       robots.push(robot)
@@ -156,11 +158,16 @@ class App extends Component {
   }
 
   stop(id) {
-    id = 0
     this.forceStop = true
     let command = { left: 0, right: 0 }
     let message = { command: command, ip: this.ips[id], port: this.port }
     this.socket.emit('move', JSON.stringify(message))
+  }
+
+  stopAll() {
+    for (let robot of this.state.robots) {
+      this.stop(robot.id)
+    }
   }
 
   async sleep(time) {
@@ -231,7 +238,7 @@ class App extends Component {
               Move
             </div>
             <br/>
-            <div className="ui orange button" onClick={ this.stop.bind(this) }>
+            <div className="ui orange button" onClick={ this.stopAll.bind(this) }>
               Stop
             </div>
             <br/>

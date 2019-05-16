@@ -15,7 +15,7 @@
     "keypress": "^0.2.1",
     "lodash": "^4.17.11",
     "munkres-js": "^1.2.2",
-    "qualisys-rt": "^0.3.1",
+    "qualisys-rt": "^0.2.4",
     "react": "^16.8.3",
     "react-dom": "^16.8.3",
     "semantic-ui-css": "^2.4.1",
