@@ -26,7 +26,7 @@ const Calculate = {
   
       const robot = this.getRobotById(id)
       // const target = App.targets[id]
-      console.log(robot)
+      // console.log(robot)
       if (!target) return { x: 0, y: 0 }
   
       let prefVx = target.x - robot.pos.x
@@ -41,7 +41,7 @@ const Calculate = {
       let rvoVy = prefVy
       let min = Infinity
   
-      console.log(rvoVx, rvoVy)
+    //   console.log(rvoVx, rvoVy)
       /*
       for (let i = 0; i < 100; i++) {
         const vx = robot.velocity.x + accel * dt // * (2 * Math.random() - 1)
@@ -57,7 +57,7 @@ const Calculate = {
         }
       }
       */
-      console.log(rvoVx, rvoVy)
+    //   console.log(rvoVx, rvoVy)
 
   
       let dir = Math.atan2(rvoVx, rvoVy) * 180 / Math.PI

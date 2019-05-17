@@ -14,8 +14,8 @@ class Robot extends Component {
   }
 
   render() {
-    this.x = (this.props.x - this.size) 
-    this.y = (this.props.y - this.size) 
+    this.x = (this.props.x) 
+    this.y = (this.props.y) 
     this.angle = this.props.angle
     
     return(

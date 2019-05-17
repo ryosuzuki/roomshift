@@ -115,54 +115,63 @@ class App extends Component {
   async move(id, point) {
     let target = point
     target.angle = 0
+    console.log('Robot: ' + this.state.robots[0].pos.x + ', ' + this.state.robots[0].pos.y)
+    console.log(point.x + ' ' + point.y)
 
     let error = 0
     while (true) {
       try {
         if (this.forceStop) break
         let res = Calculate.calculate(id, target)
-        let distThreshold = 60
-        let dirThreshold = 50
+        let distThreshold = 30
+        let dirThreshold = 10
         let angleThreshold = 5
-        let sleepTime = 30    
-        if (res.dist > distThreshold) {
-          const dt = 1
-          let rvo = Calculate.getRvoVelocity(id, target, dt)
-          console.log(rvo)
-          let angleDiff = (360 + res.angleDiff) % 360
-          let calc = this.getDirection(rvo.diff, dirThreshold)
-          let dir = calc.dir
-          let diff = calc.diff
-          console.log(calc)
-          // if (dir === 'forward' || dir === 'backward') dir = 'stop'
+        let sleepTime = 30
+        //console.log(res.dist)
 
-          let base = Math.min(60, res.dist+50)
-          let Kd = Math.min(8, (res.dist + 200) / 100)
-          let param = 100
-          let command
-          let val = 100
-          switch (dir) {
-            case 'forward':
-              command = { left: val, right: val }
-              break
-            case 'backward':
-              command = { left: -val, right: -val }
-              break
-            case 'left':
-              command = { left: -val, right: val }
-              break
-            case 'right':
-              command = { left: val, right: -val }
-              break
-          }
-          let message = { command: command, ip: this.ips[id], port: this.port }
-          console.log(message)
-          this.socket.emit('move', JSON.stringify(message))
-          await this.sleep(sleepTime) // 100      
-        } else {
-          console.log('reached to the position')
-          break
-        } 
+        const dt = 1
+        let rvo = Calculate.getRvoVelocity(id, target, dt)
+        //console.log(rvo)
+        let angleDiff = (360 + res.angleDiff) % 360
+        let calc = this.getDirection(rvo.diff, dirThreshold)
+        let dir = calc.dir
+        // console.log('1: ' + dir)
+        if(res.dist < distThreshold){
+          dir = 'stop'
+        }
+        // console.log('2: ' + dir)
+
+        let diff = calc.diff
+        //console.log(calc)
+        // if (dir === 'forward' || dir === 'backward') dir = 'stop'
+
+        let base = Math.min(60, res.dist+50)
+        let Kd = Math.min(8, (res.dist + 200) / 100)
+        let param = 100
+        let command
+        let val = 100
+       
+        switch (dir) {
+          case 'forward':
+            command = { left: val, right: val }
+            break
+          case 'backward':
+            command = { left: -val, right: -val }
+            break
+          case 'left':
+            command = { left: -val, right: val }
+            break
+          case 'right':
+            command = { left: val, right: -val }
+            break
+          case 'stop':
+            command = { left: 0, right: 0 }
+            break
+        }
+        let message = { command: command, ip: this.ips[id], port: this.port }
+        console.log(message)
+        this.socket.emit('move', JSON.stringify(message))
+        await this.sleep(sleepTime) // 100      
       } catch (err) {
         console.log(err)
         console.log('lost AR marker')
@@ -170,65 +179,7 @@ class App extends Component {
         await this.sleep(100)
         if (error > 30) break
       }
-    }
-    let command = { left: 0, right: 0 }
-    let message = { command: command, ip: this.ips[id], port: this.port }
-    this.socket.emit('move', JSON.stringify(message))
-
-
-    // let error = 0
-    // let prev
-    // let Ib = 100
-    // let Ip = 100
-    // while (true) {
-    //   try {
-    //     let res = this.calculate(id, point)
-    //     console.log(res.dist)
-    //     if (res.dist < 10) break
-    //     if (this.forceStop) break
-
-    //     let base = Math.min(Ib, res.dist+100)
-    //     let left = base
-    //     let right = base
-    //     let param = 5
-
-    //     let unit = (90 - Math.abs(res.diff)) / 90
-    //     let Kd = 3
-    //     let D = !prev ? 0 : unit - prev
-    //     prev = unit
-    //     Ib += 20
-    //     Ip += 10
-    //     let Kp = Math.min(Ip, base)
-    //     // console.log(Kp)
-    //     /*
-    //     Ryo's note: If Kp is too high, it will be overshooting. Thus, start from a small value at the beginning to avoid overshooting, while gradually increasing the value once it starts adjusting the path and angle.
-    //     */
-    //     if (res.diff < 0) { // left
-    //       right = Math.max(unit - Kd*D, 0) * Kp
-    //     } else { // right
-    //       left = Math.max(unit - Kd*D, 0) * Kp
-    //     }
-
-    //     left = parseInt(left)
-    //     right = parseInt(right)
-    //     left = Math.min(left, 255)
-    //     right = Math.min(right, 255)
-    //     let command = { left: left, right: right }
-    //     let message = { command: command, ip: this.ips[id], port: this.port }
-    //     this.socket.emit('move', JSON.stringify(message))
-    //     await this.sleep(100)
-    //   } catch (err) {
-    //     console.log('lost AR marker')
-    //     error++
-    //     await this.sleep(100)
-    //     if (error > 10) break
-    //   }
-    // }
-    // console.log('finish')
-    // this.stop(id)
-    // this.forceStop = false
-
-
+    } 
   }
 
   getDirection(diff, threshold) {
