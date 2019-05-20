@@ -17,6 +17,7 @@ class App extends Component {
     window.app = this
     window.App = this
     this.socket = socket
+    this.currentRobotID = 0
     this.state = {
       robots: [],
       data: null,
@@ -29,7 +30,7 @@ class App extends Component {
     this.socket.on('frame', this.updateRobots.bind(this))
     this.ips = {
       0: '192.168.1.147',
-      1: '192.168.1.119'
+      1: '192.168.1.149'
     }
     this.port = 8883
     this.width = 1000
@@ -123,7 +124,7 @@ class App extends Component {
       try {
         if (this.forceStop) break
         let res = Calculate.calculate(id, target)
-        let distThreshold = 30
+        let distThreshold = 10
         let dirThreshold = 10
         let angleThreshold = 5
         let sleepTime = 30
@@ -143,13 +144,13 @@ class App extends Component {
 
         let diff = calc.diff
         //console.log(calc)
-        // if (dir === 'forward' || dir === 'backward') dir = 'stop'
+        //if (dir === 'forward' || dir === 'backward') dir = 'stop'
 
         let base = Math.min(60, res.dist+50)
         let Kd = Math.min(8, (res.dist + 200) / 100)
         let param = 100
         let command
-        let val = 100
+        let val = 150
        
         switch (dir) {
           case 'forward':
@@ -166,10 +167,13 @@ class App extends Component {
             break
           case 'stop':
             command = { left: 0, right: 0 }
+            let message = { command: command, ip: this.ips[id], port: this.port }
+            this.socket.emit('move', JSON.stringify(message))
+            return
             break
         }
         let message = { command: command, ip: this.ips[id], port: this.port }
-        console.log(message)
+        //console.log(message)
         this.socket.emit('move', JSON.stringify(message))
         await this.sleep(sleepTime) // 100      
       } catch (err) {
@@ -220,6 +224,30 @@ class App extends Component {
     }
   }
 
+  shutDown(id){
+    let command = {sleep: 1}
+    let message = { command: command, ip: this.ips[id], port: this.port }
+    this.socket.emit('move', JSON.stringify(message))
+  }
+
+  shutDownAll() {
+    for (let robot of this.state.robots) {
+      this.shutDown(robot.id)
+    }
+  }
+
+  restart(id){
+    let command = {reset: 1}
+    let message = { command: command, ip: this.ips[id], port: this.port }
+    this.socket.emit('move', JSON.stringify(message))
+  }
+
+  restartAll(){
+    for (let robot of this.state.robots) {
+      this.restart(robot.id)
+    }
+  }
+
   async sleep(time) {
     return new Promise((resolve, reject) => {
       setTimeout(resolve, time)
@@ -255,7 +283,7 @@ class App extends Component {
 
   clickButton(dir) {
     let command = { left: 0, right: 0 }
-    let val = 100
+    let val = 150
     switch (dir) {
       case 'up':
         command.left = val
@@ -273,10 +301,22 @@ class App extends Component {
         command.left = val
         command.right = -val
         break
+      case 'raise':
+        command.a1 = 0
+        command.a2 = 1
+        break
+      case 'lower':
+        command.a1 = 1
+        command.a2 = 0
+        break
     }
-    let id = 0
+    let id = this.currentRobotID
     let message = { command: command, ip: this.ips[id], port: this.port }
     this.socket.emit('move', JSON.stringify(message))
+  }
+
+  changeRobotID(val){
+    this.currentRobotID = val
   }
 
   render() {
@@ -309,7 +349,7 @@ class App extends Component {
               })}
             </svg>
           </div>
-          <div className="four wide column">
+          <div className="two wide column">
             <div className="ui teal button" onClick={ this.start.bind(this) }>
               Move
             </div>
@@ -318,16 +358,48 @@ class App extends Component {
               Stop
             </div>
             <br />
-            <div className="ui buttons">
-              <button className="ui button" onClick={ this.clickButton.bind(this, 'left') }><i className="arrow left icon"></i></button>
-              <button className="ui button" onClick={ this.clickButton.bind(this, 'up') }><i className="arrow up icon"></i></button>
-              <button className="ui button" onClick={ this.clickButton.bind(this, 'down') }><i className="arrow down icon"></i></button>
-              <button className="ui button" onClick={ this.clickButton.bind(this, 'right') }><i className="arrow right icon"></i></button>
+            <div className="three ui buttons">
+              <button className="ui button"></button>
+              <button className="ui green button" onClick={ this.clickButton.bind(this, 'up') }><i className="arrow up icon"></i></button>
+              <button className="ui button"></button>              
             </div>
-            <br />
+            <br/>
+            <div className="three ui buttons">
+              <button className="ui green button" onClick={ this.clickButton.bind(this, 'left') }><i className="arrow left icon"></i></button>
+              <button className="ui orange button" onClick={ this.stopAll.bind(this) }>Stop</button>
+              <button className="ui green button" onClick={ this.clickButton.bind(this, 'right') }><i className="arrow right icon"></i></button>
+            </div>
+            <br/>
+            <div className="three ui buttons">
+              <button className="ui button"></button>
+              <button className="ui green button" onClick={ this.clickButton.bind(this, 'down') }><i className="arrow down icon"></i></button>
+              <button className="ui button"></button>
+            </div>
+            {/* <br />
             <div className="ui button" onClick={ this.clickButton.bind(this) }>
               Stop
-            </div>            
+            </div>             */}
+            <br/>
+            <button className="ui labeled icon button" onClick={ this.clickButton.bind(this, 'raise')}>
+              <i className="caret square up icon"></i>
+              Raise
+            </button>
+            <button className="ui labeled icon button" onClick={ this.clickButton.bind(this, 'lower')}>
+              <i className="caret square down icon"></i>
+              Lower
+            </button>
+            <br />
+            <div className="ui buttons">
+              <button className="ui button" onClick={ this.changeRobotID.bind(this, 0) }>Robot ID 0</button>
+              <button className="ui button" onClick={ this.changeRobotID.bind(this, 1) }>Robot ID 1</button>
+            </div>
+            <br/>
+            <div className="ui red button" onClick={ this.shutDownAll.bind(this) }>
+              SHUT DOWN
+            </div>
+            <div className="ui green button" onClick={ this.restartAll.bind(this) }>
+              RESTART
+            </div>
             <br/>
             <div>
               Robots

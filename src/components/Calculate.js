@@ -42,21 +42,19 @@ const Calculate = {
       let min = Infinity
   
     //   console.log(rvoVx, rvoVy)
-      /*
-      for (let i = 0; i < 100; i++) {
-        const vx = robot.velocity.x + accel * dt // * (2 * Math.random() - 1)
-        const vy = robot.velocity.y + accel * dt // * (2 * Math.random() - 1)
-        const collisionTime = this.getCollisionTime(id, vx, vy)
-        const dvx = vx - prefVx
-        const dvy = vy - prefVy
-        const penalty = w / collisionTime + Math.sqrt(dvx**2 + dvy**2)
-        if (penalty < min) {
-          rvoVx = vx
-          rvoVy = vy
-          min = penalty
-        }
-      }
-      */
+    //   for (let i = 0; i < 100; i++) {
+    //     const vx = robot.velocity.x + accel * dt // * (2 * Math.random() - 1)
+    //     const vy = robot.velocity.y + accel * dt // * (2 * Math.random() - 1)
+    //     const collisionTime = this.getCollisionTime(id, vx, vy)
+    //     const dvx = vx - prefVx
+    //     const dvy = vy - prefVy
+    //     const penalty = w / collisionTime + Math.sqrt(dvx**2 + dvy**2)
+    //     if (penalty < min) {
+    //       rvoVx = vx
+    //       rvoVy = vy
+    //       min = penalty
+    //     }
+    //   }
     //   console.log(rvoVx, rvoVy)
 
   
