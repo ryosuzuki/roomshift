@@ -29,8 +29,8 @@ class App extends Component {
     // this.socket.onmessage = Camera.onMessage.bind(Camera)
     this.socket.on('frame', this.updateRobots.bind(this))
     this.ips = {
-      0: '192.168.1.147',
-      1: '192.168.1.149'
+      0: '192.168.1.149',
+      1: '192.168.1.147'
     }
     this.port = 8883
     this.width = 1000
@@ -309,6 +309,10 @@ class App extends Component {
         command.a1 = 1
         command.a2 = 0
         break
+      case 'stop':
+        command.left = 0
+        command.right = 0
+        break
     }
     let id = this.currentRobotID
     let message = { command: command, ip: this.ips[id], port: this.port }
@@ -355,7 +359,7 @@ class App extends Component {
             </div>
             <br/>
             <div className="ui orange button" onClick={ this.stopAll.bind(this) }>
-              Stop
+              Force Stop
             </div>
             <br />
             <div className="three ui buttons">
@@ -366,7 +370,7 @@ class App extends Component {
             <br/>
             <div className="three ui buttons">
               <button className="ui green button" onClick={ this.clickButton.bind(this, 'left') }><i className="arrow left icon"></i></button>
-              <button className="ui orange button" onClick={ this.stopAll.bind(this) }>Stop</button>
+              <button className="ui orange button" onClick={ this.clickButton.bind(this, 'stop') }>Stop</button>
               <button className="ui green button" onClick={ this.clickButton.bind(this, 'right') }><i className="arrow right icon"></i></button>
             </div>
             <br/>
