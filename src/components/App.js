@@ -28,10 +28,18 @@ class App extends Component {
     // this.socket.onmessage = this.onMessage.bind(this)
     // this.socket.onmessage = Camera.onMessage.bind(Camera)
     this.socket.on('frame', this.updateRobots.bind(this))
-    this.ips = {
-      0: '192.168.1.149',
-      1: '192.168.1.147'
+    this.networkID = '192.168.1.'
+    this.deviceIPs = ['149','147','225','68','158']
+    this.ips = {}
+    for (var i = 0; i < this.deviceIPs.length; i++){
+      this.ips[i] = this.networkID + this.deviceIPs[i]
     }
+    console.log(this.ips)
+    // this.ips = {
+    //   0: '192.168.1.147',
+    //   1: '192.168.1.158',
+    //   2: '192.168.1.149'
+    // }
     this.port = 8883
     this.width = 1000
     this.height = 700
@@ -44,7 +52,7 @@ class App extends Component {
   }
 
   updateRobots(data) {
-    // console.log(data)
+    //console.log(data)
     let objects = data.components['6dEuler'].rigidBodies
     let robots = []
     let id = 0
@@ -324,6 +332,25 @@ class App extends Component {
   }
 
   render() {
+
+    // let ids = []
+    // for(var id = 0; id < this.ips.length; id++){
+    //   ids.push(id)
+    // }
+    // const manualControls = ids.map((id) =>
+    //   <button className="ui button" onClick={ this.changeRobotID.bind(this, id) }>RIP {this.deviceIPs[id]}</button>
+    // );
+
+    // console.log(manualControls)
+
+    //manualControls = <button className="ui button" onClick={ this.changeRobotID.bind(this, id) }>RIP {this.deviceIPs[id]}</button>;
+    // let manualControls;
+    // for(var id = 0; id < this.ips.length; id++){
+    //   manualControls = <button className="ui button" onClick={ this.changeRobotID.bind(this, id) }>RIP {this.deviceIPs[id]}</button>;
+    //   console.log(manualControls);
+      //if(id % 3 == 0) manualControls += <br/>;
+    // }
+
     return (
       <div>        
         <div className="ui grid">
@@ -382,7 +409,7 @@ class App extends Component {
             {/* <br />
             <div className="ui button" onClick={ this.clickButton.bind(this) }>
               Stop
-            </div>             */}
+            </div> */}
             <br/>
             <button className="ui labeled icon button" onClick={ this.clickButton.bind(this, 'raise')}>
               <i className="caret square up icon"></i>
@@ -394,8 +421,11 @@ class App extends Component {
             </button>
             <br />
             <div className="ui buttons">
-              <button className="ui button" onClick={ this.changeRobotID.bind(this, 0) }>Robot ID 0</button>
-              <button className="ui button" onClick={ this.changeRobotID.bind(this, 1) }>Robot ID 1</button>
+              <button className="ui button" onClick={ this.changeRobotID.bind(this, 0) }>RID 0</button>
+              <button className="ui button" onClick={ this.changeRobotID.bind(this, 1) }>RID 1</button>
+              <button className="ui button" onClick={ this.changeRobotID.bind(this, 2) }>RID 2</button>
+              <button className="ui button" onClick={ this.changeRobotID.bind(this, 3) }>RID 3</button>
+              <button className="ui button" onClick={ this.changeRobotID.bind(this, 4) }>RID 4</button>
             </div>
             <br/>
             <div className="ui red button" onClick={ this.shutDownAll.bind(this) }>
