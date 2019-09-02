@@ -23,13 +23,14 @@ class App extends Component {
       data: null,
       ids: [],
       corners: [],
-      points: []
+      points: [],
+      allRobots: []
     }
     // this.socket.onmessage = this.onMessage.bind(this)
     // this.socket.onmessage = Camera.onMessage.bind(Camera)
     this.socket.on('frame', this.updateRobots.bind(this))
     this.networkID = '192.168.1.'
-    this.deviceIPs = ['149','147','158','68','225']
+    this.deviceIPs = ['158','68','149','225','147']
     this.ips = {}
     for (var i = 0; i < this.deviceIPs.length; i++){
       this.ips[i] = this.networkID + this.deviceIPs[i]
@@ -54,13 +55,15 @@ class App extends Component {
   updateRobots(data) {
     //console.log(data)
     let objects = data.components['6dEuler'].rigidBodies
-    let robots = []
+    let foundRobots = []
+    let totalRobots = []
     for (let i = 0; i < objects.length; i++) {
-      
+      let object = objects[i]
+      let robot = null
       if (!object.x || !object.y || !object.z){
-        let robot = { id: i }
+        robot = { id: i }
       }else{
-        let robot = {
+        robot = {
           id: i,
           pos: { x: object.x / 7, y: - object.y / 7, z: object.z / 7 },
           angle: (-object.euler3 + 360 + 270) % 360,
@@ -68,10 +71,11 @@ class App extends Component {
           prefSpeed: 0.5,
           size: 1,
         }
+        foundRobots.push(robot)
       }
-      robots.push(robot)
-    }
-    this.setState({ data: data, robots: robots })
+      totalRobots.push(robot)
+    } 
+    this.setState({ data: data, robots: foundRobots, allRobots: totalRobots })
   }
 
   onClick(event) {
