@@ -7,9 +7,9 @@ module.exports = {
     bundle: [ '@babel/polyfill', path.join(__dirname, '/src/index.js') ]
   },
   output: {
-    path: path.join(__dirname, '/static'),
+    path: path.join(__dirname, '/build'),
     filename: 'bundle.js',
-    publicPath: '/static'
+    publicPath: '/build'
   },
   plugins: [
     new webpack.NoEmitOnErrorsPlugin(),

@@ -1,6 +1,6 @@
 const colors = require('colors')
-const QTMrt = require('qualisys-rt');
-const qtmReader = new QTMrt.Api();
+const QTMrt = require('qualisys-rt')
+const qtmReader = new QTMrt.Api()
 
 function init(io) {
   io.on('connection', (socket) => {
@@ -8,6 +8,7 @@ function init(io) {
   });
 
   qtmReader.on('frame', function(data) {
+    // console.log(data)
     io.sockets.emit('frame', data)
   });
 
@@ -31,4 +32,4 @@ function init(io) {
     .then(function() { return qtmReader.streamFrames({ frequency: 60, components: ['6DEuler'] }); })
 }
 
-module.exports = init;
+module.exports = init
