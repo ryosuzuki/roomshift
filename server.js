@@ -9,13 +9,24 @@ const app = express()
 const server = http.Server(app)
 const io = socketio(server)
 
-qtmParser(io)
+const mocap = false
+
+if (mocap) {
+  qtmParser(io)
+}
 
 app.use(bodyParser.json())
 app.use('/', express.static(__dirname))
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname + '/index.html'))
 })
+app.get('/vr', (req, res) => {
+  res.sendFile(path.join(__dirname + '/index-vr.html'))
+})
+app.get('/view', (req, res) => {
+  res.sendFile(path.join(__dirname + '/index-view.html'))
+})
+
 
 server.listen(8080, () => {
   console.log('listening on 8080')
@@ -23,6 +34,15 @@ server.listen(8080, () => {
 
 io.on('connection', (socket) => {
   console.log('socket connected')
+
+  socket.on('click', (data) => {
+    console.log(data)
+  })
+
+  socket.on('teleport', (data) => {
+    console.log(data)
+    socket.broadcast.emit('teleport', data)
+  })
 
   socket.on('move', (data) => {
     console.log(data)

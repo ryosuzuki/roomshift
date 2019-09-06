@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>VR room</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.5/handlebars.min.js"></script>
+  <script src="https://aframe.io/releases/0.8.2/aframe.min.js"></script>
+  <script src="https://dist.3d.io/3dio-js/2.x.x/3dio.min.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/src/lib/aframe-template-component.js"></script>
+  <script src="/src/lib/aframe-teleport-controls.js"></script>
+</head>
+
+<body>
+  <a-scene id="scene" io3d-lighting anti-alias="true" vr-mode-ui="enabled: true">
+    <a-entity id="camera" camera wasd-controls look-controls position="0 5 0" data-aframe-default-camera></a-entity>
+    <!-- <a-entity id="office" template="src: components/layout1.hbs; type: handlebars" data-length="6.25" position="-5 0 -3"></a-entity> -->
+  </a-scene>
+
+  <script>
+    const socket = io()
+    const scene = document.querySelector('#scene')
+    const chairToken = 'id:b81c89db-65cf-4518-bd58-a057ffbb6dea'
+    socket.on('teleport', (data) => {
+      console.log(data)
+      let origin = data.origin
+      let chairs = data.chairs
+      for (let chair of chairs) {
+        let chairEntity = document.querySelector(`#chair-${chair.id}`)
+        if (!chairEntity) {
+          chairEntity = document.createElement('a-entity')
+          chairEntity.setAttribute('id', `chair-${chair.id}`)
+          chairEntity.setAttribute('io3d-furniture', chairToken)
+          scene.appendChild(chairEntity)
+        }
+        let position = chair.relative
+        let rotation = chair.rotation
+        chairEntity.setAttribute('position', `${position.x} ${position.y} ${position.z}`)
+        chairEntity.setAttribute('rotation', `${rotation.x} ${rotation.y} ${rotation.z}`)
+      }
+    })
+  </script>
+</body>
+</html>

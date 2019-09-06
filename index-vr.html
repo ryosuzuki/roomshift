@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>VR room</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.5/handlebars.min.js"></script>
+  <script src="https://aframe.io/releases/0.8.2/aframe.min.js"></script>
+  <script src="https://dist.3d.io/3dio-js/2.x.x/3dio.min.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/src/lib/aframe-template-component.js"></script>
+  <script src="/src/lib/aframe-teleport-controls.js"></script>
+
+  <script>
+    const socket = io()
+    const mocap = false
+    let x = 2
+    socket.on('frame', (data) => {
+      let bodies = data.components['6dEuler'].rigidBodies
+      let objID = 0
+      let body = bodies[objID]
+      if (body) {
+        document.querySelector('#cameraRig').object3D.position.set(body.x/1000.0, body.z/1000.0, body.y/1000.0)
+      }
+    })
+    Handlebars.registerHelper("add", function(lvalue, rvalue, options) {
+      lvalue = parseFloat(lvalue);
+      rvalue = parseFloat(rvalue);
+      return lvalue + rvalue;
+    })
+  </script>
+
+  <script>
+    const chairToken = 'id:b81c89db-65cf-4518-bd58-a057ffbb6dea'
+    let chairs = []
+    let min = -2
+    let max = 2
+    for (let i = 0; i < 5; i++) {
+      let position = {
+        x: Math.random() * (max - min) + min,
+        y: 0,
+        z: Math.random() * (max - min) + min
+      }
+      let rotation = {
+        x: 0,
+        y: Math.random() * 360,
+        z: 0
+      }
+      let chair = {
+        id: i,
+        position: position,
+        rotation: rotation,
+        relative: position,
+      }
+      chairs.push(chair)
+    }
+    let origin = { x: 0, y: 1.5, z: 0 }
+    socket.emit('teleport', { origin: origin, chairs: chairs })
+  </script>
+
+  <script>
+    AFRAME.registerComponent('input-listener', {
+      init: function () {
+        this.el.addEventListener('triggerdown', function (e) {
+          socket.emit('click', true)
+          this.emit('teleportstart')
+        })
+        this.el.addEventListener('triggerup', function (e) {
+          socket.emit('click', true)
+          this.emit('teleportend')
+        })
+        this.el.addEventListener('teleportend', function (e) {
+          let camera = document.querySelector('#cameraRig')
+          let origin = camera.getAttribute('position')
+          for (let chair of chairs) {
+            let position = chair.position
+            let relative = {
+              x: position.x - origin.x,
+              y: 0,
+              z: position.z - origin.z
+            }
+            chair.relative = relative
+          }
+          socket.emit('teleport', { origin: origin, chairs: chairs })
+        })
+      }
+    })
+  </script>
+
+</head>
+<body>
+  <a-scene id="scene" io3d-lighting anti-alias="true" vr-mode-ui="enabled: true">
+
+    <a-entity id="cameraRig">
+      <a-entity id="camera" camera wasd-controls look-controls position="0 1.5 0" data-aframe-default-camera></a-entity>
+      <a-entity
+        id="controller"
+        teleport-controls="
+          cameraRig: #cameraRig;
+          teleportOrigin: #camera;
+          startEvents: teleportstart;
+          endEvents: teleportend;
+        "
+        gearvr-controls=""
+        input-listener
+      ></a-entity>
+    </a-entity>
+
+    <a-entity id="office" template="src: src/3d-models/layout-1.hbs; type: handlebars" data-length="6.25" position="-5 0 -3"></a-entity>
+
+    <!-- <a-entity id="furniture" template="src: components/furniture.html; type: handlebars"></a-entity> -->
+
+  </a-scene>
+
+
+  <script>
+    let scene = document.querySelector('#scene')
+    for (let chair of chairs) {
+      let chairEntity = document.createElement('a-entity')
+      let position = chair.position
+      let rotation = chair.rotation
+      chairEntity.setAttribute('id', `chair-${chair.id}`)
+      chairEntity.setAttribute('io3d-furniture', chairToken)
+      chairEntity.setAttribute('position', `${position.x} ${position.y} ${position.z}`)
+      chairEntity.setAttribute('rotation', `${rotation.x} ${rotation.y} ${rotation.z}`)
+      scene.appendChild(chairEntity)
+    }
+  </script>
+
+</body>
+</html>
