@@ -6,15 +6,17 @@ class Point extends Component {
   }
 
   render() {
+    let x = -this.props.x
+    let y = -this.props.y
     return(
       <g className="point" id={this.props.id}>
         <circle
-          cx={this.props.x}
-          cy={this.props.y}
+          cx={x}
+          cy={y}
           r="10"
           fill="red"
         />
-        <text x={this.props.x + 5} y={this.props.y - 10} className="label">
+        <text x={x + 5} y={y - 10} className="label">
           x: { this.props.x }, y: { this.props.y }, id: { this.props.id }
         </text>
       </g>

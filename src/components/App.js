@@ -7,6 +7,9 @@ const socket = io.connect('http://localhost:8080/')
 
 import Robot from './Robot'
 import Point from './Point'
+import { cpus } from 'os';
+
+import Calculate from './Calculate'
 
 class App extends Component {
   constructor(props) {
@@ -14,6 +17,7 @@ class App extends Component {
     window.app = this
     window.App = this
     this.socket = socket
+    this.currentRobotID = 0
     this.state = {
       robots: [],
       data: null,
@@ -24,10 +28,18 @@ class App extends Component {
     // this.socket.onmessage = this.onMessage.bind(this)
     // this.socket.onmessage = Camera.onMessage.bind(Camera)
     this.socket.on('frame', this.updateRobots.bind(this))
-    this.ips = {
-      0: '192.168.1.140',
-      1: '192.168.1.119'
+    this.networkID = '192.168.1.'
+    this.deviceIPs = ['149','147','225','68','158']
+    this.ips = {}
+    for (var i = 0; i < this.deviceIPs.length; i++){
+      this.ips[i] = this.networkID + this.deviceIPs[i]
     }
+    console.log(this.ips)
+    // this.ips = {
+    //   0: '192.168.1.147',
+    //   1: '192.168.1.158',
+    //   2: '192.168.1.149'
+    // }
     this.port = 8883
     this.width = 1000
     this.height = 700
@@ -40,7 +52,7 @@ class App extends Component {
   }
 
   updateRobots(data) {
-    // console.log(data)
+    //console.log(data)
     let objects = data.components['6dEuler'].rigidBodies
     let robots = []
     let id = 0
@@ -49,7 +61,10 @@ class App extends Component {
       let robot = {
         id: id,
         pos: { x: object.x / 7, y: - object.y / 7, z: object.z / 7 },
-        angle: (-object.euler3 + 180 + 180) % 360
+        angle: (-object.euler3 + 360 + 270) % 360,
+        velocity: { x: 0, y: 0 },
+        prefSpeed: 0.5,
+        size: 1,
       }
       id++
       robots.push(robot)
@@ -65,7 +80,7 @@ class App extends Component {
     console.log(x, y)
     let max = this.state.robots.length
     let i = this.count % max
-    let point = { x: x, y: y }
+    let point = { x: -x, y: -y }
     let points = this.state.points
     points[i] = point
     this.setState({ points: points })
@@ -107,58 +122,102 @@ class App extends Component {
   }
 
   async move(id, point) {
+    let target = point
+    target.angle = 0
+    console.log('Robot: ' + this.state.robots[0].pos.x + ', ' + this.state.robots[0].pos.y)
+    console.log(point.x + ' ' + point.y)
+
     let error = 0
-    let prev
-    let Ib = 100
-    let Ip = 100
     while (true) {
       try {
-        let res = this.calculate(id, point)
-        console.log(res.dist)
-        if (res.dist < 10) break
         if (this.forceStop) break
+        let res = Calculate.calculate(id, target)
+        let distThreshold = 10
+        let dirThreshold = 10
+        let angleThreshold = 5
+        let sleepTime = 30
+        //console.log(res.dist)
 
-        let base = Math.min(Ib, res.dist+100)
-        let left = base
-        let right = base
-        let param = 5
-
-        let unit = (90 - Math.abs(res.diff)) / 90
-        let Kd = 3
-        let D = !prev ? 0 : unit - prev
-        prev = unit
-        Ib += 20
-        Ip += 10
-        let Kp = Math.min(Ip, base)
-        // console.log(Kp)
-        /*
-        Ryo's note: If Kp is too high, it will be overshooting. Thus, start from a small value at the beginning to avoid overshooting, while gradually increasing the value once it starts adjusting the path and angle.
-        */
-        if (res.diff < 0) { // left
-          right = Math.max(unit - Kd*D, 0) * Kp
-        } else { // right
-          left = Math.max(unit - Kd*D, 0) * Kp
+        const dt = 1
+        let rvo = Calculate.getRvoVelocity(id, target, dt)
+        //console.log(rvo)
+        let angleDiff = (360 + res.angleDiff) % 360
+        let calc = this.getDirection(rvo.diff, dirThreshold)
+        let dir = calc.dir
+        // console.log('1: ' + dir)
+        if(res.dist < distThreshold){
+          dir = 'stop'
         }
+        // console.log('2: ' + dir)
 
-        left = parseInt(left)
-        right = parseInt(right)
-        left = Math.min(left, 255)
-        right = Math.min(right, 255)
-        let command = { left: left, right: right }
+        let diff = calc.diff
+        //console.log(calc)
+        //if (dir === 'forward' || dir === 'backward') dir = 'stop'
+
+        let base = Math.min(60, res.dist+50)
+        let Kd = Math.min(8, (res.dist + 200) / 100)
+        let param = 100
+        let command
+        let val = 150
+       
+        switch (dir) {
+          case 'forward':
+            command = { left: val, right: val }
+            break
+          case 'backward':
+            command = { left: -val, right: -val }
+            break
+          case 'left':
+            command = { left: -val, right: val }
+            break
+          case 'right':
+            command = { left: val, right: -val }
+            break
+          case 'stop':
+            command = { left: 0, right: 0 }
+            let message = { command: command, ip: this.ips[id], port: this.port }
+            this.socket.emit('move', JSON.stringify(message))
+            return
+            break
+        }
         let message = { command: command, ip: this.ips[id], port: this.port }
+        //console.log(message)
         this.socket.emit('move', JSON.stringify(message))
-        await this.sleep(100)
+        await this.sleep(sleepTime) // 100      
       } catch (err) {
+        console.log(err)
         console.log('lost AR marker')
         error++
         await this.sleep(100)
-        if (error > 10) break
+        if (error > 30) break
       }
-    }
-    console.log('finish')
-    this.stop(id)
-    this.forceStop = false
+    } 
   }
+
+  getDirection(diff, threshold) {
+    if (0 <= diff && diff < threshold) {
+      return { dir: 'backward', diff: diff }
+    }
+    if (threshold <= diff && diff < 90) {
+      return { dir: 'right', diff: diff }
+    }
+    if (90 <= diff && diff < 180 - threshold) {
+      return { dir: 'left', diff: 180 - diff }
+    }
+    if (180 - threshold <= diff && diff < 180 + threshold) {
+      return { dir: 'forward', diff: 180 - diff }
+    }
+    if (180 + threshold <= diff && diff < 270) {
+      return { dir: 'right', diff: diff - 180 }
+    }
+    if (270 <= diff && diff < 360 - threshold) {
+      return { dir: 'left', diff: 360 - diff }
+    }
+    if (360 - threshold <= diff && diff <= 360) {
+      return { dir: 'backward', diff: diff - 360 }
+    }
+  }
+
 
   stop(id) {
     this.forceStop = true
@@ -173,10 +232,34 @@ class App extends Component {
     }
   }
 
+  shutDown(id){
+    let command = {sleep: 1}
+    let message = { command: command, ip: this.ips[id], port: this.port }
+    this.socket.emit('move', JSON.stringify(message))
+  }
+
+  shutDownAll() {
+    for (let robot of this.state.robots) {
+      this.shutDown(robot.id)
+    }
+  }
+
+  restart(id){
+    let command = {reset: 1}
+    let message = { command: command, ip: this.ips[id], port: this.port }
+    this.socket.emit('move', JSON.stringify(message))
+  }
+
+  restartAll(){
+    for (let robot of this.state.robots) {
+      this.restart(robot.id)
+    }
+  }
+
   async sleep(time) {
     return new Promise((resolve, reject) => {
       setTimeout(resolve, time)
-    })
+    }) 
   }
 
   calculate(id, point) {
@@ -206,7 +289,68 @@ class App extends Component {
     return null
   }
 
+  clickButton(dir) {
+    let command = { left: 0, right: 0 }
+    let val = 150
+    switch (dir) {
+      case 'up':
+        command.left = val
+        command.right = val
+        break
+      case 'down':
+        command.left = -val
+        command.right = -val
+        break
+      case 'left':
+        command.left = -val
+        command.right = val
+        break    
+      case 'right':
+        command.left = val
+        command.right = -val
+        break
+      case 'raise':
+        command.a1 = 0
+        command.a2 = 1
+        break
+      case 'lower':
+        command.a1 = 1
+        command.a2 = 0
+        break
+      case 'stop':
+        command.left = 0
+        command.right = 0
+        break
+    }
+    let id = this.currentRobotID
+    let message = { command: command, ip: this.ips[id], port: this.port }
+    this.socket.emit('move', JSON.stringify(message))
+  }
+
+  changeRobotID(val){
+    this.currentRobotID = val
+  }
+
   render() {
+
+    // let ids = []
+    // for(var id = 0; id < this.ips.length; id++){
+    //   ids.push(id)
+    // }
+    // const manualControls = ids.map((id) =>
+    //   <button className="ui button" onClick={ this.changeRobotID.bind(this, id) }>RIP {this.deviceIPs[id]}</button>
+    // );
+
+    // console.log(manualControls)
+
+    //manualControls = <button className="ui button" onClick={ this.changeRobotID.bind(this, id) }>RIP {this.deviceIPs[id]}</button>;
+    // let manualControls;
+    // for(var id = 0; id < this.ips.length; id++){
+    //   manualControls = <button className="ui button" onClick={ this.changeRobotID.bind(this, id) }>RIP {this.deviceIPs[id]}</button>;
+    //   console.log(manualControls);
+      //if(id % 3 == 0) manualControls += <br/>;
+    // }
+
     return (
       <div>        
         <div className="ui grid">
@@ -236,13 +380,59 @@ class App extends Component {
               })}
             </svg>
           </div>
-          <div className="four wide column">
+          <div className="two wide column">
             <div className="ui teal button" onClick={ this.start.bind(this) }>
               Move
             </div>
             <br/>
             <div className="ui orange button" onClick={ this.stopAll.bind(this) }>
+              Force Stop
+            </div>
+            <br />
+            <div className="three ui buttons">
+              <button className="ui button"></button>
+              <button className="ui green button" onClick={ this.clickButton.bind(this, 'up') }><i className="arrow up icon"></i></button>
+              <button className="ui button"></button>              
+            </div>
+            <br/>
+            <div className="three ui buttons">
+              <button className="ui green button" onClick={ this.clickButton.bind(this, 'left') }><i className="arrow left icon"></i></button>
+              <button className="ui orange button" onClick={ this.clickButton.bind(this, 'stop') }>Stop</button>
+              <button className="ui green button" onClick={ this.clickButton.bind(this, 'right') }><i className="arrow right icon"></i></button>
+            </div>
+            <br/>
+            <div className="three ui buttons">
+              <button className="ui button"></button>
+              <button className="ui green button" onClick={ this.clickButton.bind(this, 'down') }><i className="arrow down icon"></i></button>
+              <button className="ui button"></button>
+            </div>
+            {/* <br />
+            <div className="ui button" onClick={ this.clickButton.bind(this) }>
               Stop
+            </div> */}
+            <br/>
+            <button className="ui labeled icon button" onClick={ this.clickButton.bind(this, 'raise')}>
+              <i className="caret square up icon"></i>
+              Raise
+            </button>
+            <button className="ui labeled icon button" onClick={ this.clickButton.bind(this, 'lower')}>
+              <i className="caret square down icon"></i>
+              Lower
+            </button>
+            <br />
+            <div className="ui buttons">
+              <button className="ui button" onClick={ this.changeRobotID.bind(this, 0) }>RID 0</button>
+              <button className="ui button" onClick={ this.changeRobotID.bind(this, 1) }>RID 1</button>
+              <button className="ui button" onClick={ this.changeRobotID.bind(this, 2) }>RID 2</button>
+              <button className="ui button" onClick={ this.changeRobotID.bind(this, 3) }>RID 3</button>
+              <button className="ui button" onClick={ this.changeRobotID.bind(this, 4) }>RID 4</button>
+            </div>
+            <br/>
+            <div className="ui red button" onClick={ this.shutDownAll.bind(this) }>
+              SHUT DOWN
+            </div>
+            <div className="ui green button" onClick={ this.restartAll.bind(this) }>
+              RESTART
             </div>
             <br/>
             <div>

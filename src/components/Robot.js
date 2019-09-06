@@ -14,8 +14,8 @@ class Robot extends Component {
   }
 
   render() {
-    this.x = (this.props.x - this.size) 
-    this.y = (this.props.y - this.size) 
+    this.x = (this.props.x) 
+    this.y = (this.props.y) 
     this.angle = this.props.angle
     
     return(
@@ -23,7 +23,7 @@ class Robot extends Component {
         <g
           className="block"
           onMouseDown={this.onMouseDown.bind(this)}
-          transform={ `translate(${this.x}, ${this.y})` }
+          transform={ `translate(${-this.x}, ${-this.y})` }
         >
           <circle
             cx={ 0 }
@@ -34,7 +34,7 @@ class Robot extends Component {
             strokeWidth="3"
           />
           <rect
-            transform={ `rotate(${this.angle + 270}) translate(-5, -35)`}
+            transform={ `rotate(${this.angle}) translate(-5, -35)`}
             width="10"
             height="10"
             fill="#f00"
