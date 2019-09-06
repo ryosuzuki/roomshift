@@ -1,10 +1,11 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-static const char *ssid = "Ryo Suzuki";
-static const char *password = "ryotomomi";
-//static const char *ssid = "The Grid";
-//static const char *password = "BeamMeIn";
+//static const char *ssid = "Ryo Suzuki";
+//static const char *password = "ryotomomi";
+static const char *ssid = "The Grid";
+static const char *password = "BeamMeIn";
+
 
 int localPort = 8883;
 
