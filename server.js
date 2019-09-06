@@ -18,10 +18,10 @@ if (mocap) {
 app.use(bodyParser.json())
 app.use('/', express.static(__dirname))
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname + '/index.html'))
-})
-app.get('/vr', (req, res) => {
   res.sendFile(path.join(__dirname + '/index-vr.html'))
+})
+app.get('/control', (req, res) => {
+  res.sendFile(path.join(__dirname + '/index-control.html'))
 })
 app.get('/view', (req, res) => {
   res.sendFile(path.join(__dirname + '/index-view.html'))
