@@ -1,14 +1,5 @@
 let HOST = '128.138.221.192'
-// HOST = '128.138.221.121'
-// HOST = '128.138.221.159'
-// HOST = '128.138.221.176'
-// HOST = '128.138.221.145'
-// HOST = '128.138.221.105'
-// HOST = "128.138.221.145"
-HOST = "128.138.221.176"
-HOST = "10.201.46.204"
-HOST = '10.201.46.87'
-HOST = '192.168.1.140'
+HOST = '192.168.1.68'
 
 const PORT = 8883
 
@@ -33,7 +24,7 @@ process.stdin.on('keypress', function (ch, key) {
 
   switch (key.name) {
     case 'up':
-      let forward = { left: 100, right: 100 }
+      let forward = { left: 250, right: 250 }
       sendCommand(forward)
       break
     case 'down':
@@ -41,15 +32,15 @@ process.stdin.on('keypress', function (ch, key) {
       sendCommand(stop)
       break
     case 'left':
-      let left = { left: -100, right: 100 }
+      let left = { left: -250, right: 250 }
       sendCommand(left)
       break
     case 'right':
-      let right = { left: 100, right: -100 }
+      let right = { left: 250, right: -250 }
       sendCommand(right)
       break
     case 'd':
-      let backward = { left: -100, right: -100 }
+      let backward = { left: -250, right: -250 }
       sendCommand(backward)
       break
     case 'a':
