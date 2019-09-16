@@ -1,12 +1,12 @@
 import React, { Component } from 'react'
 
-class User extends Component {
+class VirtualObject extends Component {
   constructor(props) {
     super(props)
 
     this.size = 30
-    this.color = '#ddd'
-    this.stroke = '#00ff00'
+    this.color = '#00ff00'
+    this.stroke = '#eee'
   }
 
   onMouseDown() {
@@ -54,4 +54,4 @@ class User extends Component {
   }
 }
 
-export default User
+export default VirtualObject

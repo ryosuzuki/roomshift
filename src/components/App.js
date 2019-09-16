@@ -24,7 +24,8 @@ class App extends Component {
       ids: [],
       corners: [],
       points: [],
-      allRobots: []
+      allRobots: [],
+      virtualObject: [],
     }
     // this.socket.onmessage = this.onMessage.bind(this)
     // this.socket.onmessage = Camera.onMessage.bind(Camera)
@@ -50,6 +51,26 @@ class App extends Component {
   }
 
   componentDidMount() {
+  }
+
+  updateVirtualObjects(data) {
+    let origin = data.origin
+    let objects = data.chairs
+    let virtualObjects = []
+    for (let i = 0; i < objects.length; i++) {
+      let object = objects[i]
+      let virtualObject = {
+        id: `virtual-object-${object.id}`,
+        pos: {
+          x: object.position.x,
+          y: object.position.y,
+          z: object.position.z
+        },
+        angle: object.rotation.y
+      }
+      virtualObjects[i] = virtualObject
+    }
+    this.setState({ virtualObjects: virtualObjects })
   }
 
   updateRobots(data) {
@@ -383,6 +404,17 @@ class App extends Component {
                 )
               })}
 
+              { this.state.virtualObjects.map((virtualObject, i) => {
+                return (
+                  <virtualObject
+                    id={virtualObject.id}
+                    key={virtualObject.id}
+                    x={virtualObject.pos.x}
+                    y={virtualObject.pos.y}
+                    angle={virtualObject.angle}
+                  />
+                )
+              })}
 
               <User
                 id={this.state.user.id}
