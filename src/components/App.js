@@ -30,7 +30,7 @@ class App extends Component {
     // this.socket.onmessage = Camera.onMessage.bind(Camera)
     this.socket.on('frame', this.updateRobots.bind(this))
     this.networkID = '192.168.1.'
-    this.deviceIPs = ['158','68','149','225','147']
+    this.deviceIPs = ['158','68','149','225','147', 'user']
     this.ips = {}
     for (var i = 0; i < this.deviceIPs.length; i++){
       this.ips[i] = this.networkID + this.deviceIPs[i]
@@ -57,8 +57,17 @@ class App extends Component {
     let objects = data.components['6dEuler'].rigidBodies
     let foundRobots = []
     let totalRobots = []
+    let user = {}
     for (let i = 0; i < objects.length; i++) {
       let object = objects[i]
+      if (this.deviceIPs[i] === 'user') {
+        user = {
+          id: 'user',
+          pos: { x: object.x / 7, y: - object.y / 7, z: object.z / 7 },
+          angle: (-object.euler3 + 360 + 270) % 360,
+        }
+        continue
+      }
       let robot = null
       if (!object.x || !object.y || !object.z){
         robot = { id: i }
@@ -74,8 +83,8 @@ class App extends Component {
         foundRobots.push(robot)
       }
       totalRobots.push(robot)
-    } 
-    this.setState({ data: data, robots: foundRobots, allRobots: totalRobots })
+    }
+    this.setState({ data: data, robots: foundRobots, allRobots: totalRobots, user: user })
   }
 
   onClick(event) {
@@ -165,7 +174,7 @@ class App extends Component {
         let param = 100
         let command
         let val = 150
-       
+
         switch (dir) {
           case 'forward':
             command = { left: val, right: val }
@@ -189,7 +198,7 @@ class App extends Component {
         let message = { command: command, ip: this.ips[id], port: this.port }
         //console.log(message)
         this.socket.emit('move', JSON.stringify(message))
-        await this.sleep(sleepTime) // 100      
+        await this.sleep(sleepTime) // 100
       } catch (err) {
         console.log(err)
         console.log('lost AR marker')
@@ -197,7 +206,7 @@ class App extends Component {
         await this.sleep(100)
         if (error > 30) break
       }
-    } 
+    }
   }
 
   getDirection(diff, threshold) {
@@ -265,7 +274,7 @@ class App extends Component {
   async sleep(time) {
     return new Promise((resolve, reject) => {
       setTimeout(resolve, time)
-    }) 
+    })
   }
 
   calculate(id, point) {
@@ -310,7 +319,7 @@ class App extends Component {
       case 'left':
         command.left = -val
         command.right = val
-        break    
+        break
       case 'right':
         command.left = val
         command.right = -val
@@ -358,7 +367,7 @@ class App extends Component {
     // }
 
     return (
-      <div>        
+      <div>
         <div className="ui grid">
           <div className="twelve wide column">
             <svg id="svg" width={ this.width } height={ this.height } viewBox={`-${this.width/2} -${this.height/2} ${this.width} ${this.height}`} onClick={ this.onClick.bind(this) }>
@@ -373,6 +382,15 @@ class App extends Component {
                   />
                 )
               })}
+
+
+              <User
+                id={this.state.user.id}
+                key={this.state.user.id}
+                x={this.state.user.pos.x}
+                y={this.state.user.pos.y}
+                angle={this.state.user.angle}
+              />
 
               { this.state.points.map((point, i) => {
                 return (
@@ -398,7 +416,7 @@ class App extends Component {
             <div className="three ui buttons">
               <button className="ui button"></button>
               <button className="ui green button" onClick={ this.clickButton.bind(this, 'up') }><i className="arrow up icon"></i></button>
-              <button className="ui button"></button>              
+              <button className="ui button"></button>
             </div>
             <br/>
             <div className="three ui buttons">
