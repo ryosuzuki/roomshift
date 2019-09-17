@@ -12,8 +12,8 @@ const Calculate = {
       let dx = target.x - robot.pos.x
       let dy = target.y - robot.pos.y
       let dist = Math.sqrt(dx**2 + dy**2)
-      let angleDiff = target.angle - (robot.angle + 90)
-      angleDiff = (angleDiff + 180) % 180
+      let angleDiff = target.angle - robot.angle
+      // angleDiff = (angleDiff + 180) % 180
       return { dist: dist, angleDiff: angleDiff }
     },
   

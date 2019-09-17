@@ -15,7 +15,7 @@
     const mocap = true
     socket.on('frame', (data) => {
       let objects = data.components['6dEuler'].rigidBodies
-      let cameraID = 2
+      let cameraID = 3
       for (let i = 0; i < objects.length; i++) {
         let object = objects[i]
         if (!object.x || !object.y || !object.z) {
@@ -40,9 +40,9 @@
   <script>
     const chairToken = 'id:b81c89db-65cf-4518-bd58-a057ffbb6dea'
     let chairs = []
-    let min = -2
-    let max = 2
-    let numberOfChairs = 3
+    let min = -1
+    let max = 1
+    let numberOfChairs = 2
     let numberOfRobots = 0
 
     let positions = [

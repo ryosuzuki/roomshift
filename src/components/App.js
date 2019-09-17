@@ -58,7 +58,7 @@ class App extends Component {
   }
 
   updateVirtualObjects(data) {
-    console.log(data)
+    // console.log(data)
     let origin = data.origin
     let objects = data.chairs
     let virtualObjects = []
@@ -72,7 +72,7 @@ class App extends Component {
           y: object.position.z * 1000 / 7,
           z: object.position.y * 1000 / 7
         },
-        angle: object.rotation.y
+        angle: (- object.rotation.y + 360) % 360
       }
       let point = {
         x: virtualObject.pos.x,
@@ -86,7 +86,7 @@ class App extends Component {
   }
 
   updateRobots(data) {
-    console.log(data)
+    // consoleconsole.log(data)
     let objects = data.components['6dEuler'].rigidBodies
     let foundRobots = []
     let totalRobots = []
@@ -111,7 +111,7 @@ class App extends Component {
       if (!object.x || !object.y || !object.z){
         robot = { id: i }
       }else{
-        let angle = (-object.euler3 + 360 + 270) % 360
+        let angle = (-object.euler3 + 360 + 270 + 180) % 360
         let pos = { x: object.x / 7, y: - object.y / 7, z: object.z / 7 }
         let theta = angle / 180 * Math.PI
         pos.x = pos.x - Math.sin(theta) * 300/7
@@ -182,11 +182,12 @@ class App extends Component {
 
   async move(id, point) {
     let target = point
-    target.angle = 0
     console.log('Robot: ' + this.state.robots[0].pos.x + ', ' + this.state.robots[0].pos.y)
     console.log(point.x + ' ' + point.y)
 
     let error = 0
+    let distOk = false
+    let ok = 0
     while (true) {
       try {
         if (this.forceStop) break
@@ -201,19 +202,9 @@ class App extends Component {
         let rvo = Calculate.getRvoVelocity(id, target, dt)
         //console.log(rvo)
         let angleDiff = (360 + res.angleDiff) % 360
+
         let calc = this.getDirection(rvo.diff, dirThreshold)
         let dir = calc.dir
-        // console.log('1: ' + dir)
-        if(res.dist < distThreshold){
-          // console.log('now adjust angle')
-          if (res.angleDiff < angleThreshold) {
-            dir = 'right'
-          } else {
-            dir = 'stop'
-          }
-        }
-        // console.log('2: ' + dir)
-
         let diff = calc.diff
         //console.log(calc)
         //if (dir === 'forward' || dir === 'backward') dir = 'stop'
@@ -223,6 +214,28 @@ class App extends Component {
         let param = 100
         let command
         let val = 150
+
+        // console.log('1: ' + dir)
+        if(res.dist < distThreshold || distOk){
+          distOk = true
+          // console.log('now adjust angle')
+          console.log(Math.min(angleDiff, 360 - angleDiff))
+          if (angleDiff < angleThreshold) {
+            ok++
+            dir = 'stop'
+          } else {
+            dir = 'left'
+          }
+          if (360 - angleDiff < angleThreshold) {
+            ok++
+            dir = 'stop'
+          } else {
+            dir = 'right'
+          }
+        }
+
+        console.log(dir)
+        // console.log('2: ' + dir)
 
         switch (dir) {
           case 'forward':
@@ -241,7 +254,9 @@ class App extends Component {
             command = { left: 0, right: 0 }
             let message = { command: command, ip: this.ips[id], port: this.port }
             this.socket.emit('move', JSON.stringify(message))
-            return
+            if (ok >= 5) {
+              return
+            }
             break
         }
         let message = { command: command, ip: this.ips[id], port: this.port }

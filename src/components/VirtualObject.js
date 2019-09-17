@@ -16,7 +16,7 @@ class VirtualObject extends Component {
   render() {
     this.x = this.props.x
     this.y = this.props.y
-    this.angle = - this.props.angle
+    this.angle = this.props.angle
 
     return(
       <g id={this.props.id}>

@@ -10,7 +10,7 @@ class Point extends Component {
     this.y = this.props.y
     this.angle = this.props.angle
     return(
-      <g className="point" id={this.props.id}>
+      <g id={this.props.id}>
         <g className="block"
            transform={ `translate(${-this.x}, ${-this.y})` }
         >
@@ -21,9 +21,9 @@ class Point extends Component {
             fill="red"
           />
           <rect
-            transform={ `rotate(${-this.angle}) translate(-3, -15)`}
-            width="6"
-            height="6"
+            transform={ `rotate(${this.angle}) translate(-5, -15)`}
+            width="10"
+            height="10"
             fill="red"
           />
           <text x={5} y={-10} className="label">
