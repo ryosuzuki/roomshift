@@ -62,6 +62,7 @@ class App extends Component {
     let origin = data.origin
     let objects = data.chairs
     let virtualObjects = []
+    let points = []
     for (let i = 0; i < objects.length; i++) {
       let object = objects[i]
       let virtualObject = {
@@ -73,9 +74,15 @@ class App extends Component {
         },
         angle: object.rotation.y
       }
+      let point = {
+        x: virtualObject.pos.x,
+        y: virtualObject.pos.y,
+        angle: virtualObject.angle
+      }
       virtualObjects[i] = virtualObject
+      points[i] = point
     }
-    this.setState({ virtualObjects: virtualObjects })
+    this.setState({ virtualObjects: virtualObjects, points: points })
   }
 
   updateRobots(data) {
@@ -95,7 +102,7 @@ class App extends Component {
             id: 'user',
             pos: { x: object.x / 7, y: - object.y / 7, z: object.z / 7 },
             angle: (-object.euler3 + 360 + 270) % 360,
-          }  
+          }
         }
         users.push(user)
         continue
@@ -127,7 +134,7 @@ class App extends Component {
     console.log(x, y)
     let max = this.state.robots.length
     let i = this.count % max
-    let point = { x: -x, y: -y }
+    let point = { x: -x, y: -y, angle: 0 }
     let points = this.state.points
     points[i] = point
     this.setState({ points: points })
@@ -446,6 +453,7 @@ class App extends Component {
                     key={i}
                     x={point.x}
                     y={point.y}
+                    angle={point.angle}
                   />
                 )
               })}

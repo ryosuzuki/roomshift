@@ -6,19 +6,30 @@ class Point extends Component {
   }
 
   render() {
-    let x = -this.props.x
-    let y = -this.props.y
+    this.x = this.props.x
+    this.y = this.props.y
+    this.angle = this.props.angle
     return(
       <g className="point" id={this.props.id}>
-        <circle
-          cx={x}
-          cy={y}
-          r="10"
-          fill="red"
-        />
-        <text x={x + 5} y={y - 10} className="label">
-          x: { this.props.x }, y: { this.props.y }, id: { this.props.id }
-        </text>
+        <g className="block"
+           transform={ `translate(${-this.x}, ${-this.y})` }
+        >
+          <circle
+            cx={0}
+            cy={0}
+            r="10"
+            fill="red"
+          />
+          <rect
+            transform={ `rotate(${this.angle}) translate(-3, -14)`}
+            width="6"
+            height="6"
+            fill="red"
+          />
+          <text x={5} y={-10} className="label">
+            x: { this.props.x }, y: { this.props.y }, id: { this.props.id }
+          </text>
+        </g>
       </g>
     )
   }

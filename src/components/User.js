@@ -14,8 +14,8 @@ class User extends Component {
   }
 
   render() {
-    this.x = (this.props.x)
-    this.y = (this.props.y)
+    this.x = this.props.x
+    this.y = this.props.y
     this.angle = this.props.angle
 
     return(
