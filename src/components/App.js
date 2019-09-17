@@ -179,7 +179,7 @@ class App extends Component {
       try {
         if (this.forceStop) break
         let res = Calculate.calculate(id, target)
-        let distThreshold = 10
+        let distThreshold = 30
         let dirThreshold = 10
         let angleThreshold = 5
         let sleepTime = 30
