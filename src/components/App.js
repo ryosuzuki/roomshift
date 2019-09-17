@@ -6,6 +6,8 @@ import _ from 'lodash'
 const socket = io.connect('http://localhost:8080/')
 
 import Robot from './Robot'
+import User from './User'
+import VirtualObject from './VirtualObject'
 import Point from './Point'
 import { cpus } from 'os';
 
@@ -25,13 +27,15 @@ class App extends Component {
       corners: [],
       points: [],
       allRobots: [],
-      virtualObject: [],
+      virtualObjects: [],
+      users: []
     }
     // this.socket.onmessage = this.onMessage.bind(this)
     // this.socket.onmessage = Camera.onMessage.bind(Camera)
     this.socket.on('frame', this.updateRobots.bind(this))
+    this.socket.on('teleport', this.updateVirtualObjects.bind(this))
     this.networkID = '192.168.1.'
-    this.deviceIPs = ['158','68','149','225','147', 'user']
+    this.deviceIPs = ['68','147','user'] // '149','225',, '158'
     this.ips = {}
     for (var i = 0; i < this.deviceIPs.length; i++){
       this.ips[i] = this.networkID + this.deviceIPs[i]
@@ -54,6 +58,7 @@ class App extends Component {
   }
 
   updateVirtualObjects(data) {
+    console.log(data)
     let origin = data.origin
     let objects = data.chairs
     let virtualObjects = []
@@ -62,9 +67,9 @@ class App extends Component {
       let virtualObject = {
         id: `virtual-object-${object.id}`,
         pos: {
-          x: object.position.x,
-          y: object.position.y,
-          z: object.position.z
+          x: object.position.x * 1000 / 7,
+          y: object.position.z * 1000 / 7,
+          z: object.position.y * 1000 / 7
         },
         angle: object.rotation.y
       }
@@ -74,19 +79,25 @@ class App extends Component {
   }
 
   updateRobots(data) {
-    //console.log(data)
+    console.log(data)
     let objects = data.components['6dEuler'].rigidBodies
     let foundRobots = []
     let totalRobots = []
-    let user = {}
+    let users = []
     for (let i = 0; i < objects.length; i++) {
       let object = objects[i]
       if (this.deviceIPs[i] === 'user') {
-        user = {
-          id: 'user',
-          pos: { x: object.x / 7, y: - object.y / 7, z: object.z / 7 },
-          angle: (-object.euler3 + 360 + 270) % 360,
+        let user = null
+        if (!object.x || !object.y || !object.z) {
+          user = { id: 'user', pos: { x: 0, y: 0, z: 0}, angle: 0 }
+        } else {
+          user = {
+            id: 'user',
+            pos: { x: object.x / 7, y: - object.y / 7, z: object.z / 7 },
+            angle: (-object.euler3 + 360 + 270) % 360,
+          }  
         }
+        users.push(user)
         continue
       }
       let robot = null
@@ -105,7 +116,7 @@ class App extends Component {
       }
       totalRobots.push(robot)
     }
-    this.setState({ data: data, robots: foundRobots, allRobots: totalRobots, user: user })
+    this.setState({ data: data, robots: foundRobots, allRobots: totalRobots, users: users })
   }
 
   onClick(event) {
@@ -406,7 +417,7 @@ class App extends Component {
 
               { this.state.virtualObjects.map((virtualObject, i) => {
                 return (
-                  <virtualObject
+                  <VirtualObject
                     id={virtualObject.id}
                     key={virtualObject.id}
                     x={virtualObject.pos.x}
@@ -416,13 +427,17 @@ class App extends Component {
                 )
               })}
 
-              <User
-                id={this.state.user.id}
-                key={this.state.user.id}
-                x={this.state.user.pos.x}
-                y={this.state.user.pos.y}
-                angle={this.state.user.angle}
-              />
+              { this.state.users.map((user, i) => {
+                return (
+                  <User
+                    id={user.id}
+                    key={user.id}
+                    x={user.pos.x}
+                    y={user.pos.y}
+                    angle={user.angle}
+                  />
+                )
+              })}
 
               { this.state.points.map((point, i) => {
                 return (

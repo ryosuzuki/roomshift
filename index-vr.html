@@ -12,16 +12,19 @@
 
   <script>
     const socket = io()
-    const mocap = false
-    let x = 2
+    const mocap = true
     socket.on('frame', (data) => {
       let objects = data.components['6dEuler'].rigidBodies
-      let cameraID = 0
+      let cameraID = 2
       for (let i = 0; i < objects.length; i++) {
         let object = objects[i]
+        if (!object.x || !object.y || !object.z) {
+          continue
+        }
         if (i == cameraID) {
           let camera = object
-          document.querySelector('#cameraRig').object3D.position.set(camera.x/1000.0, camera.z/1000.0, camera.y/1000.0)
+          console.log(camera)
+          document.querySelector('#cameraRig').object3D.position.set(camera.x/1000.0, camera.z/1000.0 - 1.5, -camera.y/1000.0)
         } else {
           document.querySelector(`#robot-${i}`).object3D.position.set(object.x/1000.0, object.z/1000.0, object.y/1000.0)
         }
