@@ -26,7 +26,7 @@
           console.log(camera)
           document.querySelector('#cameraRig').object3D.position.set(camera.x/1000.0, camera.z/1000.0 - 1.5, -camera.y/1000.0)
         } else {
-          document.querySelector(`#robot-${i}`).object3D.position.set(object.x/1000.0, object.z/1000.0, object.y/1000.0)
+          //document.querySelector(`#robot-${i}`).object3D.position.set(object.x/1000.0, object.z/1000.0, object.y/1000.0)
         }
       }
     })
@@ -42,13 +42,25 @@
     let chairs = []
     let min = -2
     let max = 2
-    let numberOfChairs = 5
-    let numberOfRobots = 4
+    let numberOfChairs = 3
+    let numberOfRobots = 0
+
+    let positions = [
+      { x: 1, y: 1 },
+      { x: -1, y: 1 },
+      { x: -1, y: - 1}
+    ]
+
     for (let i = 0; i < numberOfChairs; i++) {
+      // let position = {
+      //   x: Math.random() * (max - min) + min,
+      //   y: 0,
+      //   z: Math.random() * (max - min) + min
+      // }
       let position = {
-        x: Math.random() * (max - min) + min,
+        x: positions[i].x,
         y: 0,
-        z: Math.random() * (max - min) + min
+        z: positions[i].y
       }
       let rotation = {
         x: 0,
@@ -135,7 +147,7 @@
       scene.appendChild(chairEntity)
     }
 
-    for (let i = 0; i < 1; i++) {
+    for (let i = 0; i < numberOfRobots; i++) {
       let robotEntry = document.createElement('a-entity')
       robotEntry.setAttribute('id', `robot-${i}`)
       robotEntry.setAttribute('io3d-furniture', `${chairToken};material_Color:Red 70`)

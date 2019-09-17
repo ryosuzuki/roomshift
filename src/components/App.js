@@ -111,10 +111,15 @@ class App extends Component {
       if (!object.x || !object.y || !object.z){
         robot = { id: i }
       }else{
+        let angle = (-object.euler3 + 360 + 270) % 360
+        let pos = { x: object.x / 7, y: - object.y / 7, z: object.z / 7 }
+        let theta = angle / 180 * Math.PI
+        pos.x = pos.x - Math.sin(theta) * 300/7
+        pos.y = pos.y + Math.cos(theta) * 300/7
         robot = {
           id: i,
-          pos: { x: object.x / 7, y: - object.y / 7, z: object.z / 7 },
-          angle: (-object.euler3 + 360 + 270) % 360,
+          pos: pos,
+          angle: angle,
           velocity: { x: 0, y: 0 },
           prefSpeed: 0.5,
           size: 1,
