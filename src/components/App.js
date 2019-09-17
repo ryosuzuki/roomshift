@@ -205,7 +205,12 @@ class App extends Component {
         let dir = calc.dir
         // console.log('1: ' + dir)
         if(res.dist < distThreshold){
-          dir = 'stop'
+          // console.log('now adjust angle')
+          if (res.angleDiff < angleThreshold) {
+            dir = 'right'
+          } else {
+            dir = 'stop'
+          }
         }
         // console.log('2: ' + dir)
 
@@ -415,17 +420,6 @@ class App extends Component {
         <div className="ui grid">
           <div className="twelve wide column">
             <svg id="svg" width={ this.width } height={ this.height } viewBox={`-${this.width/2} -${this.height/2} ${this.width} ${this.height}`} onClick={ this.onClick.bind(this) }>
-              { this.state.robots.map((robot, i) => {
-                return (
-                  <Robot
-                    id={robot.id}
-                    key={robot.id}
-                    x={robot.pos.x}
-                    y={robot.pos.y}
-                    angle={robot.angle}
-                  />
-                )
-              })}
 
               { this.state.virtualObjects.map((virtualObject, i) => {
                 return (
@@ -447,6 +441,18 @@ class App extends Component {
                     x={user.pos.x}
                     y={user.pos.y}
                     angle={user.angle}
+                  />
+                )
+              })}
+
+              { this.state.robots.map((robot, i) => {
+                return (
+                  <Robot
+                    id={robot.id}
+                    key={robot.id}
+                    x={robot.pos.x}
+                    y={robot.pos.y}
+                    angle={robot.angle}
                   />
                 )
               })}

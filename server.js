@@ -41,7 +41,9 @@ io.on('connection', (socket) => {
 
   socket.on('teleport', (data) => {
     console.log(data)
+    // if (data.agent.includes('Oculus')) {
     socket.broadcast.emit('teleport', data)
+    // }
   })
 
   socket.on('move', (data) => {

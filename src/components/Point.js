@@ -21,7 +21,7 @@ class Point extends Component {
             fill="red"
           />
           <rect
-            transform={ `rotate(${this.angle}) translate(-3, -14)`}
+            transform={ `rotate(${-this.angle}) translate(-3, -15)`}
             width="6"
             height="6"
             fill="red"
