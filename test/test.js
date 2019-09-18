@@ -1,5 +1,16 @@
 let HOST = '128.138.221.192'
 HOST = '192.168.1.68'
+HOST = '192.168.1.68'
+
+/*
+wall_1: 158
+wall_2: 149
+table:  147
+chair_1:225
+chair_2: 68
+*/
+
+
 
 const PORT = 8883
 
@@ -36,11 +47,11 @@ process.stdin.on('keypress', function (ch, key) {
       sendCommand(left)
       break
     case 'right':
-      let right = { left: 250, right: -250 }
+      let right = { left: 1250, right: -1250 }
       sendCommand(right)
       break
     case 'd':
-      let backward = { left: -250, right: -250 }
+      let backward = { left: -1250, right: -1250 }
       sendCommand(backward)
       break
     case 'a':
