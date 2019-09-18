@@ -1,5 +1,22 @@
-let HOST = '128.138.221.192'
-HOST = '192.168.1.68'
+// let HOST = '128.138.221.192'
+// HOST = '192.168.1.68'
+// HOST = '192.168.1.68'
+
+let objects = {
+  wall_1: { ip: 158, speed: 150 },
+  wall_2: { ip: 149, speed: 150 },
+  table:  { ip: 147, speed: 250 },
+  chair_1:{ ip: 225, speed: 150 },
+  chair_2:{ ip:  68, speed: 150 }
+}
+
+
+let name = process.argv[2]
+console.log(name)
+
+let HOST = '192.168.1.' + objects[name]['ip']
+let speed = objects[name]['speed']
+
 
 const PORT = 8883
 
@@ -24,7 +41,7 @@ process.stdin.on('keypress', function (ch, key) {
 
   switch (key.name) {
     case 'up':
-      let forward = { left: 250, right: 250 }
+      let forward = { left: speed, right: speed }
       sendCommand(forward)
       break
     case 'down':
@@ -32,15 +49,15 @@ process.stdin.on('keypress', function (ch, key) {
       sendCommand(stop)
       break
     case 'left':
-      let left = { left: -250, right: 250 }
+      let left = { left: -speed, right: speed }
       sendCommand(left)
       break
     case 'right':
-      let right = { left: 250, right: -250 }
+      let right = { left: speed, right: -speed }
       sendCommand(right)
       break
     case 'd':
-      let backward = { left: -250, right: -250 }
+      let backward = { left: -speed, right: -speed }
       sendCommand(backward)
       break
     case 'a':
