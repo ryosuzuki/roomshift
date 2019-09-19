@@ -4,9 +4,9 @@
 
 let objects = {
   wall_1: { ip: 158, speed: 150 },
-  wall_2: { ip: 149, speed: 150 },
-  robot:  { ip: 147, speed: 150 },
-  table:{ ip: 225, speed: 150 },
+  wall_2: { ip: 149, speed: 250 },
+  table:  { ip: 147, speed: 150 },
+  chair_1:{ ip: 225, speed: 150 },
   chair_2:{ ip:  68, speed: 150 }
 }
 
