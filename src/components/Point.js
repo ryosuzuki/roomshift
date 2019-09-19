@@ -18,16 +18,16 @@ class Point extends Component {
             cx={0}
             cy={0}
             r="10"
-            fill="red"
+            fill="blue"
           />
           <rect
             transform={ `rotate(${this.angle}) translate(-5, -15)`}
             width="10"
             height="10"
-            fill="red"
+            fill="blue"
           />
-          <text x={5} y={-10} className="label">
-            x: { this.props.x }, y: { this.props.y }, id: { this.props.id }
+          <text x={5} y={70} className="label">
+            x: { Math.round(this.props.x) }, y: { Math.round(this.props.y) }, id: { this.props.id }
           </text>
         </g>
       </g>

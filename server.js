@@ -9,7 +9,7 @@ const app = express()
 const server = http.Server(app)
 const io = socketio(server)
 
-const mocap = true
+const mocap = false
 
 if (mocap) {
   qtmParser(io)
@@ -41,10 +41,15 @@ io.on('connection', (socket) => {
 
   socket.on('teleport', (data) => {
     console.log(data)
-    const target = 'Android'
+    const target = 'Macintosh' // 'Android'
     if (data.agent.includes(target)) {
       socket.broadcast.emit('teleport', data)
     }
+  })
+
+  socket.on('highlightChair', (data) => {
+    console.log(data)
+    socket.broadcast.emit('highlightChair', data)
   })
 
   socket.on('move', (data) => {

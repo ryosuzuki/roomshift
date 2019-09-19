@@ -11,6 +11,17 @@ class VirtualObject extends Component {
 
   onMouseDown() {
     console.log('mouse down')
+    let point = {
+      x: this.props.x,
+      y: this.props.y,
+      angle: this.props.angle
+    }
+    console.log(point)
+    let max = 2 // this.state.robots.length
+    let points = App.state.points
+    let i = points.length % max
+    points[i] = point
+    App.setState({ points: points })
   }
 
   render() {
@@ -19,7 +30,7 @@ class VirtualObject extends Component {
     this.angle = this.props.angle
 
     return(
-      <g id={this.props.id}>
+      <g id={`chair-${this.props.id}`}>
         <g
           className="block"
           onMouseDown={this.onMouseDown.bind(this)}
@@ -30,8 +41,8 @@ class VirtualObject extends Component {
             cy={ 0 }
             r={ this.size }
             fill={ this.color }
-            stroke={ this.stroke }
-            strokeWidth="3"
+            stroke={ this.props.id == this.props.highlightId ? 'blue' : this.stroke }
+            strokeWidth="6"
           />
           <rect
             transform={ `rotate(${this.angle}) translate(-5, -35)`}
@@ -40,7 +51,7 @@ class VirtualObject extends Component {
             fill="#f00"
           />
           <text x={5} y={-10} className="label">
-            id: {this.props.id}
+            id: {`chair-${this.props.id}`}
           </text>
           <text x={5} y={10} className="label">
             x: {parseInt(this.props.x)}, y: {parseInt(this.props.y)}

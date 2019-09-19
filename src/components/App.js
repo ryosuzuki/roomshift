@@ -28,7 +28,8 @@ class App extends Component {
       points: [],
       allRobots: [],
       virtualObjects: [],
-      users: []
+      users: [],
+      highlightObjectId: null,
     }
     // this.socket.onmessage = this.onMessage.bind(this)
     // this.socket.onmessage = Camera.onMessage.bind(Camera)
@@ -66,7 +67,7 @@ class App extends Component {
     for (let i = 0; i < objects.length; i++) {
       let object = objects[i]
       let virtualObject = {
-        id: `virtual-object-${object.id}`,
+        id: object.id,
         pos: {
           x: object.position.x * 1000 / 7,
           y: object.position.z * 1000 / 7,
@@ -80,9 +81,10 @@ class App extends Component {
         angle: virtualObject.angle
       }
       virtualObjects[i] = virtualObject
-      points[i] = point
+      // points[i] = point
     }
-    this.setState({ virtualObjects: virtualObjects, points: points })
+    // this.setState({ virtualObjects: virtualObjects, points: points })
+    this.setState({ virtualObjects: virtualObjects })
   }
 
   updateRobots(data) {
@@ -132,6 +134,7 @@ class App extends Component {
   }
 
   onClick(event) {
+    return
     if (!this.count) this.count = 0
     let x = event.clientX - this.width/2
     let y = event.clientY - this.height/2
@@ -410,6 +413,11 @@ class App extends Component {
     this.currentRobotID = val
   }
 
+  changeHighlightChair(val) {
+    this.setState({ highlightObjectId: val })
+    this.socket.emit('highlightChair', val)
+  }
+
   render() {
 
     // let ids = []
@@ -444,6 +452,7 @@ class App extends Component {
                     x={virtualObject.pos.x}
                     y={virtualObject.pos.y}
                     angle={virtualObject.angle}
+                    highlightId={this.state.highlightObjectId}
                   />
                 )
               })}
@@ -538,6 +547,14 @@ class App extends Component {
             </div>
             <div className="ui green button" onClick={ this.restartAll.bind(this) }>
               RESTART
+            </div>
+            <br/>
+            <br/>
+            <div className="ui buttons">
+              <button className="ui button" onClick={ this.changeHighlightChair.bind(this, 0) }>Chair 0</button>
+              <button className="ui button" onClick={ this.changeHighlightChair.bind(this, 1) }>Chair 1</button>
+              <button className="ui button" onClick={ this.changeHighlightChair.bind(this, 2) }>Chair 2</button>
+              <button className="ui button" onClick={ this.changeHighlightChair.bind(this, 3) }>Chair 3</button>
             </div>
             <br/>
             <div>
