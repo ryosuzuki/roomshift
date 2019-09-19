@@ -24,6 +24,9 @@ console.log('start')
 const sendCommand = function(json) {
   const dgram = require('dgram')
   const client = dgram.createSocket('udp4')
+  if (!json.ms) {
+    json.ms = 0
+  }
   let str = JSON.stringify(json)
   let message = Buffer.from(str)
   client.send(message, 0, message.length, PORT, HOST, function(err, bytes) {
@@ -38,7 +41,6 @@ keypress(process.stdin)
 
 process.stdin.on('keypress', function (ch, key) {
   console.log(key.name)
-
   switch (key.name) {
     case 'up':
       let forward = { left: speed, right: speed }

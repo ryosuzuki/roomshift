@@ -217,6 +217,7 @@ class App extends Component {
         let param = 100
         let command
         let val = 150
+        let ms = 0
 
         // console.log('1: ' + dir)
         if(res.dist < distThreshold || distOk){
@@ -227,12 +228,14 @@ class App extends Component {
             ok++
             dir = 'stop'
           } else {
+            ms = 100
             dir = 'left'
           }
           if (360 - angleDiff < angleThreshold) {
             ok++
             dir = 'stop'
           } else {
+            ms = 100
             dir = 'right'
           }
         }
@@ -242,16 +245,16 @@ class App extends Component {
 
         switch (dir) {
           case 'forward':
-            command = { left: val, right: val }
+            command = { left: val, right: val, ms: ms }
             break
           case 'backward':
-            command = { left: -val, right: -val }
+            command = { left: -val, right: -val, ms: ms }
             break
           case 'left':
-            command = { left: -val, right: val }
+            command = { left: -val, right: val, ms: ms }
             break
           case 'right':
-            command = { left: val, right: -val }
+            command = { left: val, right: -val, ms: ms }
             break
           case 'stop':
             command = { left: 0, right: 0 }
