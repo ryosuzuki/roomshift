@@ -42,6 +42,13 @@ void loop() {
     int right = root["right"];
     drivePWM(left, right);
 
+    int ms = root["ms"];
+    if (ms > 0) {
+      delay(ms);
+      drivePWM(0, 0);
+    }
+
+
     if (root["a1"] > 0) {
       digitalWrite(a1, HIGH);
     } else {
