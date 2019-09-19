@@ -4,8 +4,8 @@
 
 let objects = {
   wall_1: { ip: 158, speed: 150 },
-  wall_2: { ip: 149, speed: 150 },
-  table:  { ip: 147, speed: 250 },
+  wall_2: { ip: 149, speed: 250 },
+  table:  { ip: 147, speed: 150 },
   chair_1:{ ip: 225, speed: 150 },
   chair_2:{ ip:  68, speed: 150 }
 }
@@ -44,7 +44,7 @@ process.stdin.on('keypress', function (ch, key) {
       let forward = { left: speed, right: speed }
       sendCommand(forward)
       break
-    case 'down':
+    case 'space':
       let stop = { left: 0, right: 0 }
       sendCommand(stop)
       break
@@ -56,7 +56,7 @@ process.stdin.on('keypress', function (ch, key) {
       let right = { left: speed, right: -speed }
       sendCommand(right)
       break
-    case 'd':
+    case 'down':
       let backward = { left: -speed, right: -speed }
       sendCommand(backward)
       break
