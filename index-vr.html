@@ -25,6 +25,7 @@
           let camera = object
           console.log(camera)
           document.querySelector('#cameraRig').object3D.position.set(camera.x/1000.0, camera.z/1000.0 - 1.5, -camera.y/1000.0)
+          //document.querySelector('#cameraRig').object3D.rotation.set(0, 0, 0)
         } else {
           //document.querySelector(`#robot-${i}`).object3D.position.set(object.x/1000.0, object.z/1000.0, object.y/1000.0)
         }
@@ -119,6 +120,7 @@
   <a-scene id="scene" io3d-lighting anti-alias="true" vr-mode-ui="enabled: true">
 
     <a-entity id="cameraRig">
+      <!-- tried look-controls.enabled="false", didn't work.  -->
       <a-entity id="camera" camera wasd-controls look-controls position="0 1.5 0" data-aframe-default-camera></a-entity>
       <a-entity
         id="controller"
