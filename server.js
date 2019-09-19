@@ -9,7 +9,7 @@ const app = express()
 const server = http.Server(app)
 const io = socketio(server)
 
-const mocap = false
+const mocap = true
 
 if (mocap) {
   qtmParser(io)
@@ -41,7 +41,7 @@ io.on('connection', (socket) => {
 
   socket.on('teleport', (data) => {
     console.log(data)
-    const target = 'Macintosh' // 'Android'
+    const target = 'Windows' // 'Android'
     if (data.agent.includes(target)) {
       socket.broadcast.emit('teleport', data)
     }

@@ -36,7 +36,7 @@ class App extends Component {
     this.socket.on('frame', this.updateRobots.bind(this))
     this.socket.on('teleport', this.updateVirtualObjects.bind(this))
     this.networkID = '192.168.1.'
-    this.deviceIPs = ['225','68','147','user'] // '149','225',, '158'
+    this.deviceIPs = ['225','147','user','68'] // '149','225',, '158'
     this.ips = {}
     for (var i = 0; i < this.deviceIPs.length; i++){
       this.ips[i] = this.networkID + this.deviceIPs[i]
