@@ -36,7 +36,7 @@ class App extends Component {
     this.socket.on('frame', this.updateRobots.bind(this))
     this.socket.on('teleport', this.updateVirtualObjects.bind(this))
     this.networkID = '192.168.1.'
-    this.deviceIPs = ['225','147','user','68'] // '149','225',, '158'
+    this.deviceIPs = ['225','225','147','user','68'] // '149','225',, '158'
     this.ips = {}
     for (var i = 0; i < this.deviceIPs.length; i++){
       this.ips[i] = this.networkID + this.deviceIPs[i]
@@ -195,10 +195,10 @@ class App extends Component {
       try {
         if (this.forceStop) break
         let res = Calculate.calculate(id, target)
-        let distThreshold = 30
+        let distThreshold = 5
         let dirThreshold = 10
-        let angleThreshold = 5
-        let sleepTime = 30
+        let angleThreshold = 15
+        let sleepTime = 100
         //console.log(res.dist)
 
         const dt = 1
@@ -219,24 +219,57 @@ class App extends Component {
         let val = 150
         let ms = 0
 
+        if (res.dist < distThreshold * 3) {
+          ms = 200
+          sleepTime = 400
+        }
+
         // console.log('1: ' + dir)
         if(res.dist < distThreshold || distOk){
           distOk = true
           // console.log('now adjust angle')
           console.log(Math.min(angleDiff, 360 - angleDiff))
           if (angleDiff < angleThreshold) {
-            ok++
-            dir = 'stop'
+            if (res.dist > distThreshold * 2) {
+              calc = this.getDirection(rvo.diff, 90)
+              dir = calc.dir
+              ms = 200
+              sleepTime = 400
+            } else {
+              ok++
+              dir = 'stop'
+            }
           } else {
-            ms = 100
-            dir = 'left'
+            if (angleDiff < 90) {
+              ms = 300
+              sleepTime = 500
+              dir = 'right'
+            } else {
+              ms = 300
+              sleepTime = 500
+              dir = 'left'
+            }
           }
           if (360 - angleDiff < angleThreshold) {
-            ok++
-            dir = 'stop'
+            if (res.dist > distThreshold * 2) {
+              calc = this.getDirection(rvo.diff, 90)
+              dir = calc.dir
+              ms = 200
+              sleepTime = 400
+            } else {
+              ok++
+              dir = 'stop'
+            }
           } else {
-            ms = 100
-            dir = 'right'
+            if (360 - angleDiff < 90) {
+              ms = 500
+              sleepTime = 500
+              dir = 'left'
+            } else {
+              ms = 300
+              sleepTime = 500
+              dir = 'right'
+            }
           }
         }
 
@@ -245,25 +278,28 @@ class App extends Component {
 
         switch (dir) {
           case 'forward':
-            command = { left: val, right: val, ms: ms }
+            command = { left: val, right: val }
             break
           case 'backward':
-            command = { left: -val, right: -val, ms: ms }
+            command = { left: -val, right: -val }
             break
           case 'left':
-            command = { left: -val, right: val, ms: ms }
+            command = { left: -val, right: val }
             break
           case 'right':
-            command = { left: val, right: -val, ms: ms }
+            command = { left: val, right: -val }
             break
           case 'stop':
             command = { left: 0, right: 0 }
             let message = { command: command, ip: this.ips[id], port: this.port }
             this.socket.emit('move', JSON.stringify(message))
-            if (ok >= 5) {
+            if (ok >= 1) {
               return
             }
             break
+        }
+        if (ms > 0) {
+          command.ms = ms
         }
         let message = { command: command, ip: this.ips[id], port: this.port }
         //console.log(message)
