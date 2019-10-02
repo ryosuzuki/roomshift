@@ -36,7 +36,7 @@ class App extends Component {
     this.socket.on('frame', this.updateRobots.bind(this))
     this.socket.on('teleport', this.updateVirtualObjects.bind(this))
     this.networkID = '192.168.1.'
-    this.deviceIPs = ['225','225','147','user','68'] // '149','225',, '158'
+    this.deviceIPs = ['68','225','147','user'] // '149','225',, '158'
     this.ips = {}
     for (var i = 0; i < this.deviceIPs.length; i++){
       this.ips[i] = this.networkID + this.deviceIPs[i]
@@ -195,7 +195,7 @@ class App extends Component {
       try {
         if (this.forceStop) break
         let res = Calculate.calculate(id, target)
-        let distThreshold = 5
+        let distThreshold = 15
         let dirThreshold = 10
         let angleThreshold = 15
         let sleepTime = 100
@@ -230,8 +230,8 @@ class App extends Component {
           // console.log('now adjust angle')
           console.log(Math.min(angleDiff, 360 - angleDiff))
           if (angleDiff < angleThreshold) {
-            if (res.dist > distThreshold * 2) {
-              calc = this.getDirection(rvo.diff, 90)
+            if (res.dist > 10) {
+              calc = this.getDirection2(rvo.diff)
               dir = calc.dir
               ms = 200
               sleepTime = 400
@@ -241,33 +241,37 @@ class App extends Component {
             }
           } else {
             if (angleDiff < 90) {
-              ms = 300
-              sleepTime = 500
+              ms = 400
+              sleepTime = 1000
+              val = 200
               dir = 'right'
             } else {
-              ms = 300
-              sleepTime = 500
+              ms = 400
+              sleepTime = 1000
+              val = 200
               dir = 'left'
             }
           }
           if (360 - angleDiff < angleThreshold) {
-            if (res.dist > distThreshold * 2) {
-              calc = this.getDirection(rvo.diff, 90)
+            if (res.dist > 10) {
+              calc = this.getDirection2(rvo.diff)
               dir = calc.dir
               ms = 200
-              sleepTime = 400
+              sleepTime = 1000
             } else {
               ok++
               dir = 'stop'
             }
           } else {
             if (360 - angleDiff < 90) {
-              ms = 500
-              sleepTime = 500
+              ms = 400
+              sleepTime = 1000
+              val = 200
               dir = 'left'
             } else {
-              ms = 300
-              sleepTime = 500
+              ms = 400
+              sleepTime = 1000
+              val = 200
               dir = 'right'
             }
           }
@@ -339,6 +343,17 @@ class App extends Component {
     }
   }
 
+  getDirection2(diff, threshold) {
+    if (0 <= diff && diff < 90) {
+      return { dir: 'backward', diff: diff }
+    }
+    if (90 <= diff && diff < 270) {
+      return { dir: 'forward', diff: 180 - diff }
+    }
+    if (270 <= diff && diff <= 360) {
+      return { dir: 'backward', diff: diff - 360 }
+    }
+  }
 
   stop(id) {
     this.forceStop = true

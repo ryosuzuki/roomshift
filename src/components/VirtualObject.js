@@ -7,6 +7,8 @@ class VirtualObject extends Component {
     this.size = 30
     this.color = '#00ff00'
     this.stroke = '#eee'
+
+    this.count = 0
   }
 
   onMouseDown() {
@@ -19,9 +21,10 @@ class VirtualObject extends Component {
     console.log(point)
     let max = 2 // this.state.robots.length
     let points = App.state.points
-    let i = points.length % max
+    let i = this.count % max
     points[i] = point
     App.setState({ points: points })
+    this.count++
   }
 
   render() {

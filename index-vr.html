@@ -46,10 +46,10 @@
     let numberOfRobots = 0
 
     let positions = [
-      { x: 1, y: 1 },
-      { x: -1, y: 1 },
-      { x: -1, y: - 1},
-      { x: 1, y: - 1}
+      { x: 1, y: 0.7 },
+      { x: -1, y: 0.7 },
+      { x: -1, y: - 0.7},
+      { x: 1, y: - 0.7}
     ]
 
     for (let i = 0; i < numberOfChairs; i++) {
@@ -150,7 +150,12 @@
     </a-entity>
 
     <a-entity id="office" template="src: src/3d-models/layout-1.hbs; type: handlebars" data-length="6.25" position="-5 0 -3"></a-entity>
-
+<a-entity position="-0.66 0 1.2" rotation="0 90 0">
+  <a-entity io3d-furniture="id:a71d107e-6846-45d0-8473-bc34b7a93034" position="0 0 0" rotation="0 0 0"></a-entity>
+  <a-entity io3d-furniture="id:b81c89db-65cf-4518-bd58-a057ffbb6dea" position="-0.7 0 0.8" rotation="0 150 0"></a-entity>
+  <a-entity io3d-furniture="id:b81c89db-65cf-4518-bd58-a057ffbb6dea" position="-0.63 0 -0.8" rotation="0 0 0"></a-entity>
+  <a-entity io3d-furniture="id:6d333d6e-c81b-49c8-928a-2436ee915291" position="0.1 0.73 0.1" rotation="0 -10 0"></a-entity>
+</a-entity>
     <!-- <a-entity id="furniture" template="src: components/furniture.html; type: handlebars"></a-entity> -->
 
   </a-scene>
@@ -166,7 +171,7 @@
       chairEntity.setAttribute('io3d-furniture', `${chairToken};material_Color:Nero 66`)
       chairEntity.setAttribute('position', `${position.x} ${position.y} ${position.z}`)
       chairEntity.setAttribute('rotation', `${rotation.x} ${rotation.y} ${rotation.z}`)
-      scene.appendChild(chairEntity)
+      // scene.appendChild(chairEntity)
     }
 
     for (let i = 0; i < numberOfRobots; i++) {
